@@ -1,6 +1,15 @@
 import { NextResponse } from "next/server";
 import OpenAI from "openai";
 import fetch from "node-fetch";
+type TMDBSearchResponse = {
+  results: Array<{
+    id: number;
+    title: string;
+    poster_path: string | null;
+    overview: string;
+    release_date: string;
+  }>;
+};
 
 // Initialize OpenAI client
 const openai = new OpenAI({
@@ -62,7 +71,8 @@ Do NOT include anything else. Only return valid JSON like this:
               m.title
             )}`
           );
-          const searchData = await searchRes.json();
+          const searchData = (await searchRes.json()) as TMDBSearchResponse;
+
 
           if (searchData.results && searchData.results.length > 0) {
             const movieData = searchData.results[0];
