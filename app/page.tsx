@@ -1,4 +1,4 @@
-"use client"; // Page uses client-side hooks
+"use client";
 
 import { useState } from "react";
 
@@ -6,135 +6,119 @@ interface Movie {
   title: string;
   overview: string;
   poster_path: string;
-  trailer_url?: string;
+  trailer?: string;
 }
 
-export default function HomePage({
-  theme,
-}: {
-  theme: "light" | "dark";
-}) {
+export default function Page() {
   const [query, setQuery] = useState("");
   const [movies, setMovies] = useState<Movie[]>([]);
+  const [theme, setTheme] = useState<"light" | "dark">("light");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+
+  const toggleTheme = () => setTheme(theme === "light" ? "dark" : "light");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    setError("");
-    setMovies([]);
+    if (!query) return;
 
+    setLoading(true);
     try {
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: query }),
       });
-
-      if (!res.ok) {
-        throw new Error("Failed to fetch movies");
-      }
-
       const data = await res.json();
 
-      // Ensure we have an array of movies
+      // Parse reply into movie objects
       const parsedMovies: Movie[] = Array.isArray(data.reply)
         ? data.reply
-        : [];
+        : JSON.parse(data.reply);
 
-      setMovies(parsedMovies.slice(0, 10)); // first 10 movies
+      // Limit to 10 movies
+      setMovies(parsedMovies.slice(0, 10));
     } catch (err) {
       console.error(err);
-      setError("No movies found. Try a different query.");
+      setMovies([]);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <main
-      className={`flex flex-col items-center justify-center min-h-screen p-4 ${
-        theme === "dark" ? "bg-gray-900 text-white" : "bg-white text-gray-900"
-      }`}
+    <div
+      className={`${theme} min-h-screen w-full flex flex-col items-center justify-start bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 p-6`}
     >
-      <h1 className="text-4xl font-bold mb-6">The Movie Bot 🎬</h1>
+      {/* Light/Dark Toggle */}
+      <button
+        onClick={toggleTheme}
+        className="absolute top-6 right-6 px-4 py-2 bg-gray-300 dark:bg-gray-700 rounded text-gray-900 dark:text-gray-100 font-semibold"
+      >
+        {theme === "light" ? "Dark Mode" : "Light Mode"}
+      </button>
 
-      {/* Input form */}
+      {/* Logo and Title */}
+      <div className="flex flex-col items-center mb-6">
+        <img
+          src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTI4IiBoZWlnaHQ9IjEyOCIgdmlld0JveD0iMCAwIDEyOCAxMjgiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjEyOCIgaGVpZ2h0PSIxMjgiIGZpbGw9IiNmZjAwMDAiIHJ4PSIyNCIvPjx0ZXh0IHg9IjY0IiB5PSI2OCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSI0MCIgZmlsbD0id2hpdGUiIGZvbnQtZmFtaWx5PSJBcmlhbCI+TW92aWUgQm90PC90ZXh0Pjwvc3ZnPg=="
+          alt="Movie Bot Logo"
+          className="w-32 h-32 mb-4 rounded-full shadow-md"
+        />
+        <h1 className="text-4xl font-bold text-center">The Movie Bot</h1>
+      </div>
+
+      {/* Search Form */}
       <form
         onSubmit={handleSubmit}
-        className="flex w-full max-w-md mb-6"
+        className="flex flex-col items-center w-full max-w-xl mb-6"
       >
         <input
           type="text"
+          placeholder="Enter movie genre or title..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Type a movie genre or keyword..."
-          className={`flex-1 px-4 py-2 rounded-l-md border border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-            theme === "dark"
-              ? "bg-gray-800 text-white border-gray-600 placeholder-gray-400"
-              : "bg-white text-gray-900 placeholder-gray-500"
-          }`}
+          className="w-full p-3 mb-4 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
         <button
           type="submit"
-          className={`px-4 py-2 rounded-r-md border border-gray-400 ${
-            theme === "dark"
-              ? "bg-gray-700 text-white hover:bg-gray-600"
-              : "bg-gray-200 text-gray-900 hover:bg-gray-300"
-          }`}
+          className="w-full py-3 bg-gray-900 dark:bg-gray-200 text-white dark:text-gray-900 font-bold rounded hover:opacity-90 transition"
         >
-          Send
+          {loading ? "Loading..." : "Send"}
         </button>
       </form>
 
-      {/* Loading / Error */}
-      {loading && <p className="mb-4">Loading...</p>}
-      {error && <p className="mb-4 text-red-500">{error}</p>}
-
-      {/* Movies grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {movies.map((movie, index) => (
+      {/* Movies Display */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-6xl">
+        {movies.length === 0 && !loading && <p>No movies to display.</p>}
+        {movies.map((movie, idx) => (
           <div
-            key={index}
-            className={`flex flex-col items-center p-4 rounded-lg shadow-md ${
-              theme === "dark"
-                ? "bg-gray-800 text-white"
-                : "bg-gray-100 text-gray-900"
-            }`}
+            key={idx}
+            className="bg-white dark:bg-gray-800 rounded shadow-md overflow-hidden flex flex-col"
           >
-            {movie.poster_path ? (
+            {movie.poster_path && (
               <img
-                src={`https://image.tmdb.org/t/p/w300${movie.poster_path}`}
+                src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
                 alt={movie.title}
-                className="mb-2 rounded-md shadow-sm"
+                className="w-full h-64 object-cover"
               />
-            ) : (
-              <div className="w-48 h-72 mb-2 bg-gray-400 flex items-center justify-center rounded-md">
-                No Image
-              </div>
             )}
-            <h2 className="font-semibold text-lg mb-1 text-center">
-              {movie.title}
-            </h2>
-            <p className="text-sm mb-2 text-center">
-              {movie.overview.length > 100
-                ? movie.overview.slice(0, 100) + "..."
-                : movie.overview}
-            </p>
-            {movie.trailer_url && (
-              <a
-                href={movie.trailer_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-500 hover:underline text-sm"
-              >
-                Watch Trailer
-              </a>
-            )}
+            <div className="p-4 flex flex-col flex-1">
+              <h2 className="text-xl font-semibold mb-2">{movie.title}</h2>
+              <p className="text-sm flex-1">{movie.overview}</p>
+              {movie.trailer && (
+                <a
+                  href={movie.trailer}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-3 text-blue-500 hover:underline"
+                >
+                  Watch Trailer
+                </a>
+              )}
+            </div>
           </div>
         ))}
       </div>
-    </main>
+    </div>
   );
 }
