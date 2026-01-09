@@ -1,133 +1,140 @@
-"use client";
+"use client"; // Page uses client-side hooks
 
 import { useState } from "react";
 
-type Movie = {
+interface Movie {
   title: string;
   overview: string;
   poster_path: string;
   trailer_url?: string;
-};
+}
 
-export default function HomePage() {
+export default function HomePage({
+  theme,
+}: {
+  theme: "light" | "dark";
+}) {
   const [query, setQuery] = useState("");
   const [movies, setMovies] = useState<Movie[]>([]);
   const [loading, setLoading] = useState(false);
-  const [theme, setTheme] = useState<"light" | "dark">("light");
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!query) return;
-
     setLoading(true);
+    setError("");
+    setMovies([]);
+
     try {
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: query }),
       });
-      const data = await res.json();
 
-      if (!data.reply) {
-        setMovies([]);
-        alert("No response received");
-        setLoading(false);
-        return;
+      if (!res.ok) {
+        throw new Error("Failed to fetch movies");
       }
 
-      // Parse reply into movie objects
-      const parsedMovies: Movie[] = data.reply.map((movie: any) => {
-        let trailer_url;
-        if (movie.trailer_key) {
-          trailer_url = `https://www.youtube.com/watch?v=${movie.trailer_key}`;
-        }
-        return {
-          title: movie.title,
-          overview: movie.overview,
-          poster_path: movie.poster_path,
-          trailer_url,
-        };
-      });
+      const data = await res.json();
 
-      setMovies(parsedMovies.slice(0, 10)); // show first 10 movies
+      // Ensure we have an array of movies
+      const parsedMovies: Movie[] = Array.isArray(data.reply)
+        ? data.reply
+        : [];
+
+      setMovies(parsedMovies.slice(0, 10)); // first 10 movies
     } catch (err) {
       console.error(err);
-      alert("Failed to fetch movies");
+      setError("No movies found. Try a different query.");
     } finally {
       setLoading(false);
     }
   };
 
-  const toggleTheme = () =>
-    setTheme(theme === "light" ? "dark" : "light");
-
   return (
-    <div className={theme === "dark" ? "bg-gray-900 text-white min-h-screen" : "bg-gray-100 text-gray-900 min-h-screen"}>
-      <div className="flex justify-end p-4">
+    <main
+      className={`flex flex-col items-center justify-center min-h-screen p-4 ${
+        theme === "dark" ? "bg-gray-900 text-white" : "bg-white text-gray-900"
+      }`}
+    >
+      <h1 className="text-4xl font-bold mb-6">The Movie Bot 🎬</h1>
+
+      {/* Input form */}
+      <form
+        onSubmit={handleSubmit}
+        className="flex w-full max-w-md mb-6"
+      >
+        <input
+          type="text"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Type a movie genre or keyword..."
+          className={`flex-1 px-4 py-2 rounded-l-md border border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+            theme === "dark"
+              ? "bg-gray-800 text-white border-gray-600 placeholder-gray-400"
+              : "bg-white text-gray-900 placeholder-gray-500"
+          }`}
+        />
         <button
-          onClick={toggleTheme}
-          className="px-4 py-2 rounded border border-gray-400 hover:bg-gray-300 dark:hover:bg-gray-700"
+          type="submit"
+          className={`px-4 py-2 rounded-r-md border border-gray-400 ${
+            theme === "dark"
+              ? "bg-gray-700 text-white hover:bg-gray-600"
+              : "bg-gray-200 text-gray-900 hover:bg-gray-300"
+          }`}
         >
-          {theme === "light" ? "Dark Mode" : "Light Mode"}
+          Send
         </button>
-      </div>
+      </form>
 
-      <div className="flex flex-col items-center justify-center px-4">
-        <h1 className="text-4xl font-bold mb-6 text-center">
-          Movie Bot 🎬
-        </h1>
+      {/* Loading / Error */}
+      {loading && <p className="mb-4">Loading...</p>}
+      {error && <p className="mb-4 text-red-500">{error}</p>}
 
-        <form
-          onSubmit={handleSubmit}
-          className="flex mb-6 w-full max-w-md"
-        >
-          <input
-            type="text"
-            placeholder="What movies are you in the mood for?"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            className="flex-grow px-4 py-2 border rounded-l-md focus:outline-none dark:bg-gray-700 dark:text-white dark:border-gray-600"
-          />
-          <button
-            type="submit"
-            disabled={loading}
-            className="px-4 py-2 bg-gray-800 text-white rounded-r-md hover:bg-gray-700 disabled:opacity-50"
+      {/* Movies grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        {movies.map((movie, index) => (
+          <div
+            key={index}
+            className={`flex flex-col items-center p-4 rounded-lg shadow-md ${
+              theme === "dark"
+                ? "bg-gray-800 text-white"
+                : "bg-gray-100 text-gray-900"
+            }`}
           >
-            {loading ? "Searching..." : "Send"}
-          </button>
-        </form>
-
-        {movies.length > 0 && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {movies.map((movie) => (
-              <div
-                key={movie.title}
-                className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 flex flex-col items-center text-center"
-              >
-                {movie.poster_path && (
-                  <img
-                    src={`https://image.tmdb.org/t/p/w300${movie.poster_path}`}
-                    alt={movie.title}
-                    className="w-full h-auto mb-4 rounded"
-                  />
-                )}
-                <h2 className="text-xl font-semibold mb-2">{movie.title}</h2>
-                <p className="text-sm mb-4">{movie.overview}</p>
-                {movie.trailer_url && (
-                  <a
-                    href={movie.trailer_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
-                  >
-                    Watch Trailer
-                  </a>
-                )}
+            {movie.poster_path ? (
+              <img
+                src={`https://image.tmdb.org/t/p/w300${movie.poster_path}`}
+                alt={movie.title}
+                className="mb-2 rounded-md shadow-sm"
+              />
+            ) : (
+              <div className="w-48 h-72 mb-2 bg-gray-400 flex items-center justify-center rounded-md">
+                No Image
               </div>
-            ))}
+            )}
+            <h2 className="font-semibold text-lg mb-1 text-center">
+              {movie.title}
+            </h2>
+            <p className="text-sm mb-2 text-center">
+              {movie.overview.length > 100
+                ? movie.overview.slice(0, 100) + "..."
+                : movie.overview}
+            </p>
+            {movie.trailer_url && (
+              <a
+                href={movie.trailer_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-500 hover:underline text-sm"
+              >
+                Watch Trailer
+              </a>
+            )}
           </div>
-        )}
+        ))}
       </div>
-    </div>
+    </main>
   );
 }
