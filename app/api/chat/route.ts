@@ -10,6 +10,14 @@ type TMDBSearchResponse = {
     release_date: string;
   }>;
 };
+type TMDBVideoResponse = {
+  results: Array<{
+    id: string;
+    key: string;
+    site: string;
+    type: string;
+  }>;
+};
 
 // Initialize OpenAI client
 const openai = new OpenAI({
@@ -86,7 +94,8 @@ Do NOT include anything else. Only return valid JSON like this:
             const videoRes = await fetch(
               `https://api.themoviedb.org/3/movie/${movieData.id}/videos?api_key=${process.env.TMDB_API_KEY}`
             );
-            const videoData = await videoRes.json();
+            const videoData = (await videoRes.json()) as TMDBVideoResponse;
+
 
             const trailerObj = videoData.results?.find(
               (v: any) => v.type === "Trailer" && v.site === "YouTube"
