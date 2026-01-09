@@ -1,120 +1,44 @@
-import { NextResponse } from "next/server";
-import OpenAI from "openai";
-import fetch from "node-fetch";
-type TMDBSearchResponse = {
-  results: Array<{
-    id: number;
-    title: string;
-    poster_path: string | null;
-    overview: string;
-    release_date: string;
-  }>;
-};
-type TMDBVideoResponse = {
-  results: Array<{
-    id: string;
-    key: string;
-    site: string;
-    type: string;
-  }>;
-};
+// app/api/chat/route.ts
+import { NextRequest, NextResponse } from "next/server";
 
-// Initialize OpenAI client
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+const TMDB_API_KEY = process.env.TMDB_API_KEY;
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
-    const { message, sessionId } = await req.json();
+    const { message } = await req.json();
 
-    // Prompt for OpenAI to return a list of movies in JSON
-    const prompt = `
-You are a helpful Movie Recommendation Bot.
-User input: "${message}"
+    // Basic search query from user message
+    const searchQuery = encodeURIComponent(message);
 
-Return a JSON array called "movies" with up to 5 movies, each containing:
-- title
-- year
-- genre
-
-Do NOT include anything else. Only return valid JSON like this:
-
-{
-  "movies": [
-    { "title": "Movie Title", "year": 2023, "genre": "Action" }
-  ]
-}
-`;
-
-    // Call OpenAI
-    const response = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
-      messages: [{ role: "user", content: prompt }],
-    });
-
-    // Parse OpenAI response
-    let movieList: { title: string; year: number; genre: string }[] = [];
-    try {
-      const text = response.choices[0].message?.content || "";
-      const match = text.match(/\{[\s\S]*\}/); // extract JSON object
-      if (match) {
-        const json = JSON.parse(match[0]);
-        movieList = json.movies || [];
-      }
-    } catch (err) {
-      console.error("JSON parse error from OpenAI:", err);
-    }
-
-    // Fetch TMDB poster + trailer for each movie
-    const moviesWithPosters = await Promise.all(
-      movieList.map(async (m) => {
-        let poster = "";
-        let trailer = "";
-
-        try {
-          // Search TMDB for movie
-          const searchRes = await fetch(
-            `https://api.themoviedb.org/3/search/movie?api_key=${process.env.TMDB_API_KEY}&query=${encodeURIComponent(
-              m.title
-            )}`
-          );
-          const searchData = (await searchRes.json()) as TMDBSearchResponse;
-
-
-          if (searchData.results && searchData.results.length > 0) {
-            const movieData = searchData.results[0];
-
-            // Poster
-            poster = movieData.poster_path
-              ? `https://image.tmdb.org/t/p/w500${movieData.poster_path}`
-              : "";
-
-            // Fetch videos
-            const videoRes = await fetch(
-              `https://api.themoviedb.org/3/movie/${movieData.id}/videos?api_key=${process.env.TMDB_API_KEY}`
-            );
-            const videoData = (await videoRes.json()) as TMDBVideoResponse;
-
-
-            const trailerObj = videoData.results?.find(
-              (v: any) => v.type === "Trailer" && v.site === "YouTube"
-            );
-            if (trailerObj) {
-              trailer = `https://www.youtube.com/watch?v=${trailerObj.key}`;
-            }
-          }
-        } catch (err) {
-          console.error("TMDB fetch error:", err);
-        }
-
-        return { ...m, poster, trailer };
-      })
+    // Fetch movies from TMDB
+    const searchRes = await fetch(
+      `https://api.themoviedb.org/3/search/movie?api_key=${TMDB_API_KEY}&query=${searchQuery}&language=en-US&page=1&include_adult=false`
     );
 
-    return NextResponse.json({ movies: moviesWithPosters });
-  } catch (err) {
-    console.error("Server error:", err);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    if (!searchRes.ok) {
+      return NextResponse.json({ error: "TMDB search failed." }, { status: 500 });
+    }
+
+    const searchData: any = await searchRes.json();
+
+    // Limit to 10 movies
+    const topMovies = searchData.results?.slice(0, 10) || [];
+
+    // Map to the format your frontend expects
+    const movies = topMovies.map((m: any) => ({
+      id: m.id,
+      title: m.title,
+      overview: m.overview,
+      poster: m.poster_path
+        ? `https://image.tmdb.org/t/p/w500${m.poster_path}`
+        : null,
+      release_date: m.release_date,
+      rating: m.vote_average,
+    }));
+
+    return NextResponse.json({ movies });
+  } catch (err: any) {
+    console.error("API error:", err);
+    return NextResponse.json({ error: err.message || "Unknown error." }, { status: 500 });
   }
 }
