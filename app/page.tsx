@@ -1,104 +1,101 @@
-"use client"; // Required for hooks
+"use client";
 
 import { useState } from "react";
 
-interface Movie {
+type Movie = {
   title: string;
-  poster_path: string;
-  release_date?: string;
+  poster_path?: string;
   overview?: string;
-}
+};
 
-export default function Page() {
-  const [message, setMessage] = useState("");
+export default function HomePage() {
+  const [query, setQuery] = useState("");
   const [movies, setMovies] = useState<Movie[]>([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!message.trim()) return;
-
+    if (!query) return;
     setLoading(true);
-    setMovies([]);
+    setError("");
 
     try {
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message }),
+        body: JSON.stringify({ message: query }),
       });
 
       const data = await res.json();
 
-      // Parse response safely
       if (!data.reply) {
-        alert("No response received from the bot.");
-        setLoading(false);
-        return;
-      }
+        setError("No response from server");
+        setMovies([]);
+      } else {
+        // If reply is already an object, don't parse again
+        const parsedMovies: Movie[] = typeof data.reply === "string" 
+          ? JSON.parse(data.reply)
+          : data.reply;
 
-      let parsedMovies: Movie[] = [];
-      try {
-        parsedMovies = JSON.parse(data.reply).slice(0, 10);
-      } catch (err) {
-        console.error("Error parsing bot response:", err);
-        alert("Failed to parse response. Check console.");
+        setMovies(parsedMovies.slice(0, 10)); // first 10 movies
       }
-
-      setMovies(parsedMovies);
     } catch (err) {
       console.error(err);
-      alert("Failed to fetch movies. Check console.");
+      setError("Failed to fetch movies");
+      setMovies([]);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <main className="flex flex-col items-center justify-center min-h-screen w-full px-4 space-y-6">
-      <h1 className="text-3xl font-bold mb-4 text-center">
-        Movie Recommendation Bot
-      </h1>
+    <main className="flex flex-col items-center justify-center gap-6 p-6 w-full max-w-4xl">
+      {/* Title */}
+      <h1 className="text-4xl font-bold text-center">🎬 The Movie Bot</h1>
 
-      {/* Chat input */}
-      <form
-        onSubmit={handleSubmit}
-        className="flex w-full max-w-md gap-2"
-      >
+      {/* Input Form */}
+      <form onSubmit={handleSubmit} className="flex w-full max-w-md gap-2">
         <input
           type="text"
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          placeholder="What kind of movies are you in the mood for?"
-          className="flex-1 px-4 py-2 rounded border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Enter a movie genre or keyword..."
+          className="flex-1 px-4 py-2 rounded border border-gray-400 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800"
         />
         <button
           type="submit"
-          className="px-4 py-2 rounded bg-gray-900 text-white hover:bg-gray-700 dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-gray-200 transition-colors"
+          className="px-4 py-2 bg-gray-900 text-white dark:bg-white dark:text-gray-900 rounded font-semibold hover:opacity-90 transition"
         >
-          {loading ? "Loading..." : "Send"}
+          Send
         </button>
       </form>
 
-      {/* Movie results */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 w-full max-w-5xl">
-        {movies.map((movie, index) => (
+      {/* Error Message */}
+      {error && <p className="text-red-500">{error}</p>}
+
+      {/* Loading */}
+      {loading && <p>Loading...</p>}
+
+      {/* Movies Grid */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 w-full mt-4">
+        {movies.map((movie, i) => (
           <div
-            key={index}
-            className="flex flex-col items-center text-center dark:text-white"
+            key={i}
+            className="flex flex-col items-center bg-gray-200 dark:bg-gray-800 rounded p-2"
           >
             {movie.poster_path ? (
               <img
-                src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+                src={`https://image.tmdb.org/t/p/w200${movie.poster_path}`}
                 alt={movie.title}
-                className="rounded shadow-md"
+                className="rounded mb-2"
               />
             ) : (
-              <div className="w-32 h-48 bg-gray-300 dark:bg-gray-700 flex items-center justify-center text-sm">
+              <div className="w-32 h-48 bg-gray-400 dark:bg-gray-600 flex items-center justify-center text-white mb-2">
                 No Image
               </div>
             )}
-            <p className="mt-2 font-semibold">{movie.title}</p>
+            <p className="text-center font-semibold">{movie.title}</p>
           </div>
         ))}
       </div>
