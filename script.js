@@ -1,202 +1,250 @@
-// Hardcoded keys for now just to prove the site works
-const TMDB_KEY = '0edd59a7f344fa2c15e57eaa38f20252';
-const OPENAI_KEY = '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';
-
-// Rest of your code...
-let currentPage = 1;
-let currentQuery = '';
-let allResults = [];
-let searchMode = 'text'; // 'text', 'genre', or 'ai'
-
-// --- 1. THEME TOGGLE & STARS ---
-document.getElementById('theme-toggle').addEventListener('click', () => {
-    const html = document.documentElement;
-    const isDark = html.getAttribute('data-theme') === 'dark';
-    const newTheme = isDark ? 'light' : 'dark';
-    
-    html.setAttribute('data-theme', newTheme);
-    document.getElementById('theme-toggle').innerText = isDark ? '🌙 Dark Mode' : '☀️ Light Mode';
-    
-    if (newTheme === 'dark') {
-        createStars();
-    } else {
-        document.getElementById('star-container').innerHTML = '';
-    }
-});
-
-function createStars() {
-    const container = document.getElementById('star-container');
-    container.innerHTML = '';
-    for (let i = 0; i < 150; i++) {
-        const star = document.createElement('div');
-        star.className = 'star';
-        star.style.left = Math.random() * 100 + '%';
-        star.style.top = Math.random() * 100 + '%';
-        const size = Math.random() * 2 + 'px';
-        star.style.width = size;
-        star.style.height = size;
-        star.style.setProperty('--duration', (Math.random() * 3 + 2) + 's');
-        star.style.setProperty('--drift-duration', (Math.random() * 60 + 40) + 's');
-        container.appendChild(star);
-    }
+/* 1. THEME VARIABLES */
+:root {
+    --bg-color: #ffffff;
+    --text-color: #1a1a1a;
+    --card-bg: #f8f8f8;
+    --accent: #e50914; /* Movie Bot Red */
+    --font-main: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 }
 
-// --- 2. SEARCH & GENRE TRIGGERS ---
-document.getElementById('search-btn').addEventListener('click', () => {
-    const query = document.getElementById('search-input').value.trim();
-    if (!query) return;
-
-    currentQuery = query;
-    currentPage = 1;
-    allResults = [];
-    document.getElementById('movie-grid').innerHTML = '';
-    document.getElementById('genre-dropdown').value = ''; // Reset dropdown
-    
-    if (query.split(' ').length > 3) {
-        searchMode = 'ai';
-        getAIRecommendations(query);
-    } else {
-        searchMode = 'text';
-        fetchMovies();
-    }
-});
-
-document.getElementById('genre-dropdown').addEventListener('change', (e) => {
-    const genreId = e.target.value;
-    if (!genreId) return;
-
-    currentQuery = genreId;
-    currentPage = 1;
-    allResults = [];
-    searchMode = 'genre';
-    document.getElementById('search-input').value = ''; // Reset input
-    document.getElementById('movie-grid').innerHTML = '';
-    fetchMovies();
-});
-
-// --- 3. DATA FETCHING ---
-async function fetchMovies() {
-    let url = '';
-    const apiPage = Math.ceil((currentPage * 12) / 20); // Syncs our 12-card view with TMDB's 20-card page
-
-    if (searchMode === 'genre') {
-        url = `https://api.themoviedb.org/3/discover/movie?api_key=${TMDB_KEY}&with_genres=${currentQuery}&page=${apiPage}`;
-    } else {
-        url = `https://api.themoviedb.org/3/search/movie?api_key=${TMDB_KEY}&query=${encodeURIComponent(currentQuery)}&page=${apiPage}`;
-    }
-
-    try {
-        const resp = await fetch(url);
-        const data = await resp.json();
-        
-        // Add new results only if they aren't already in the list
-        const newMovies = data.results.filter(m => !allResults.find(existing => existing.id === m.id));
-        allResults = [...allResults, ...newMovies];
-        
-        displayMovies();
-    } catch (err) {
-        console.error("Fetch Error:", err);
-    }
+[data-theme="dark"] {
+    --bg-color: #05070a;
+    --text-color: #ffffff;
+    --card-bg: #161b22;
 }
 
-async function getAIRecommendations(prompt) {
-    document.getElementById('movie-grid').innerHTML = '<p style="text-align:center; width:100%;">The Bot is thinking...</p>';
-    try {
-        const response = await fetch('https://api.openai.com/v1/chat/completions', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${OPENAI_KEY}`
-            },
-            body: JSON.stringify({
-                model: "gpt-3.5-turbo",
-                messages: [{role: "system", content: "Return a comma-separated list of 24 movie titles based on the user request. No numbers."}, {role: "user", content: prompt}]
-            })
-        });
-        const data = await response.json();
-        const titles = data.choices[0].message.content.split(',');
-        
-        for (let title of titles) {
-            const movie = await fetchMovieByTitle(title.trim());
-            if (movie) allResults.push(movie);
-        }
-        document.getElementById('movie-grid').innerHTML = '';
-        displayMovies();
-    } catch (err) {
-        console.error("AI Error:", err);
-    }
+/* 2. CORE STYLES */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: var(--font-main);
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    transition: background 0.4s ease, color 0.4s ease;
+    overflow-x: hidden;
 }
 
-async function fetchMovieByTitle(title) {
-    const url = `https://api.themoviedb.org/3/search/movie?api_key=${TMDB_KEY}&query=${encodeURIComponent(title)}`;
-    const resp = await fetch(url);
-    const data = await resp.json();
-    return data.results ? data.results[0] : null;
+/* 3. ANIMATED STARRY BACKGROUND (Dark Mode Only) */
+#star-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    background: radial-gradient(circle at center, #1B2735 0%, #05070a 100%);
+    display: none; /* Hidden by default */
+    overflow: hidden;
 }
 
-// --- 4. DISPLAY LOGIC ---
-function displayMovies() {
-    const grid = document.getElementById('movie-grid');
-    const start = (currentPage - 1) * 12;
-    const end = start + 12;
-    const slice = allResults.slice(start, end);
-
-    slice.forEach(movie => {
-        if (!movie.poster_path) return;
-        const card = document.createElement('div');
-        card.className = 'movie-card';
-        card.innerHTML = `
-            <img src="https://image.tmdb.org/t/p/w500${movie.poster_path}" alt="${movie.title}">
-            <div class="movie-info"><h3>${movie.title}</h3></div>
-        `;
-        card.onclick = () => showDetails(movie.id);
-        grid.appendChild(card);
-    });
-
-    // Check if we should show the "Load More" button
-    const loadMoreBtn = document.getElementById('load-more');
-    if (allResults.length > end || (searchMode !== 'ai' && allResults.length >= 12)) {
-        loadMoreBtn.style.display = 'block';
-    } else {
-        loadMoreBtn.style.display = 'none';
-    }
+[data-theme="dark"] #star-container {
+    display: block; /* Shows only in dark mode */
 }
 
-document.getElementById('load-more').addEventListener('click', () => {
-    currentPage++;
-    // If we are getting close to running out of movies in our local list, fetch more from API
-    if (allResults.length <= currentPage * 12 && searchMode !== 'ai') {
-        fetchMovies();
-    } else {
-        displayMovies();
-    }
-});
-
-// --- 5. MODAL / POPUP ---
-async function showDetails(id) {
-    const vUrl = `https://api.themoviedb.org/3/movie/${id}/videos?api_key=${TMDB_KEY}`;
-    const wUrl = `https://api.themoviedb.org/3/movie/${id}/watch/providers?api_key=${TMDB_KEY}`;
-    const [vR, wR] = await Promise.all([fetch(vUrl), fetch(wUrl)]);
-    const vData = await vR.json();
-    const wData = await wR.json();
-    
-    const trailer = vData.results.find(v => v.site === 'YouTube' && (v.type === 'Trailer' || v.type === 'Teaser'));
-    const providers = wData.results?.US?.flatrate || [];
-
-    const pHTML = providers.map(p => `<img src="https://image.tmdb.org/t/p/original${p.logo_path}" class="provider-logo" title="${p.provider_name}">`).join('');
-    
-    document.getElementById('modal-body').innerHTML = `
-        ${trailer ? `<iframe width="100%" height="400" src="https://www.youtube.com/embed/${trailer.key}" frameborder="0" allowfullscreen></iframe>` : '<p>No Trailer Available</p>'}
-        <h2 style="margin-top:20px;">Where to Stream (US)</h2>
-        <div style="display:flex; flex-wrap:wrap; justify-content:center;">${pHTML || 'Not found on subscription streaming.'}</div>
-    `;
-    document.getElementById('movie-modal').style.display = 'block';
+.star {
+    position: absolute;
+    background: white;
+    border-radius: 50%;
+    opacity: 0.5;
+    animation: twinkle var(--duration) infinite ease-in-out, 
+               drift var(--drift-duration) linear infinite;
 }
 
-document.querySelector('.close-modal').onclick = () => {
-    document.getElementById('movie-modal').style.display = 'none';
-};
+@keyframes twinkle {
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.2); }
+}
 
-window.onclick = (e) => {
-    if (e.target.className === 'modal') document.getElementById('movie-modal').style.display = 'none';
-};
+@keyframes drift {
+    from { transform: translateY(0); }
+    to { transform: translateY(-100vh); }
+}
+
+/* 4. HEADER & LOGO */
+header {
+    padding: 20px;
+    text-align: center;
+}
+
+.header-controls {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 10px;
+}
+
+#theme-toggle {
+    padding: 10px 15px;
+    border-radius: 20px;
+    border: 1px solid var(--accent);
+    background: transparent;
+    color: var(--text-color);
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.main-logo {
+    display: block;
+    margin: 20px auto 40px auto;
+    max-width: 600px;
+    width: 90%;
+    height: auto;
+    filter: drop-shadow(0px 0px 8px rgba(229, 9, 20, 0.4));
+}
+
+/* 5. SEARCH BOX & DROPDOWN */
+.search-box {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 40px;
+}
+
+#genre-dropdown, #search-input {
+    padding: 14px 20px;
+    border-radius: 30px;
+    border: 2px solid var(--accent);
+    background: var(--bg-color);
+    color: var(--text-color);
+    outline: none;
+    font-size: 1rem;
+}
+
+#search-input {
+    width: 350px;
+}
+
+#search-btn {
+    padding: 14px 30px;
+    border-radius: 30px;
+    background-color: var(--accent);
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 1rem;
+    transition: transform 0.2s;
+}
+
+#search-btn:hover {
+    transform: scale(1.05);
+}
+
+/* 6. MOVIE GRID & CARDS */
+#movie-grid {
+    display: grid;
+    /* Configured for 4 cards per row on wide screens, 12 total looks best */
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 30px;
+    padding: 0 40px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.movie-card {
+    background: var(--card-bg);
+    border-radius: 15px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.movie-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 12px 24px rgba(0,0,0,0.3);
+}
+
+.movie-card img {
+    width: 100%;
+    aspect-ratio: 2 / 3;
+    object-fit: cover;
+    display: block;
+}
+
+.movie-info {
+    padding: 15px;
+    text-align: center;
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.movie-info h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    line-height: 1.3;
+    /* Limits title to 2 lines so posters stay aligned */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;  
+    overflow: hidden;
+}
+
+/* 7. LOAD MORE SECTION (Centered Fix) */
+.load-more-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    padding: 60px 0;
+}
+
+#load-more {
+    padding: 16px 45px;
+    font-size: 1.1rem;
+    background-color: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 40px;
+    cursor: pointer;
+    font-weight: bold;
+    box-shadow: 0 4px 20px rgba(229, 9, 20, 0.4);
+    transition: background 0.3s, transform 0.2s;
+}
+
+#load-more:hover {
+    background-color: #b20710;
+    transform: scale(1.05);
+}
+
+/* 8. MODAL (Popup) */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    left: 0; top: 0;
+    width: 100%; height: 100%;
+    background-color: rgba(0,0,0,0.95);
+    backdrop-filter: blur(5px);
+}
+
+.modal-content {
+    background-color: var(--card-bg);
+    margin: 50px auto;
+    padding: 30px;
+    width: 90%;
+    max-width: 800px;
+    border-radius: 20px;
+    position: relative;
+}
+
+.close-modal {
+    position: absolute;
+    right: 25px;
+    top: 15px;
+    font-size: 40px;
+    color: var(--accent);
+    cursor: pointer;
+}
+
+.provider-logo {
+    width: 65px;
+    height: 65px;
+    margin: 10px;
+    border-radius: 12px;
+}
