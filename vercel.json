@@ -1,1 +1,6 @@
-
+{
+  "env": {
+    "TMDB_API_KEY": "@tmdb_api_key",
+    "OPENAI_API_KEY": "@openai_api_key"
+  }
+}
