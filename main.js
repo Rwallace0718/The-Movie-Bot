@@ -95,19 +95,26 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 
     // B. The Genre Dropdown
-    const genreDropdown = document.getElementById('genre-dropdown');
-    if (genreDropdown) {
-        genreDropdown.addEventListener('change', async (event) => {
-            const selectedGenre = event.target.value;
-            if (!selectedGenre) return;
+  // Replace your existing genreDropdown listener with this:
+const genreDropdown = document.getElementById('genre-dropdown');
+if (genreDropdown) {
+    genreDropdown.addEventListener('change', async (event) => {
+        const genreId = event.target.value;
+        if (!genreId) return;
 
-            const resultsContainer = document.getElementById('results-container');
-            resultsContainer.innerHTML = "<p>Finding the best " + selectedGenre + " movies...</p>";
+        const resultsContainer = document.getElementById('results-container');
+        resultsContainer.innerHTML = "<p>Loading the best movies in this genre...</p>";
 
-            const movies = await fetchMoviesFromTMDB(selectedGenre);
-            displayMovies(movies);
-        });
-    }
+        // We use a different API path for Genres to avoid the "name in title" bug
+        try {
+            const response = await fetch(`/api/movies?genre=${genreId}`);
+            const data = await response.json();
+            displayMovies(data.results || []);
+        } catch (error) {
+            console.error("Genre Fetch Error:", error);
+        }
+    });
+}
 
     // C. Light/Dark Mode Toggle
     const themeBtn = document.getElementById('theme-toggle');
@@ -118,4 +125,5 @@ window.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
 
