@@ -1,1 +1,55 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Movie Bot</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="star-container"></div>
+
+    <header>
+        <div class="header-controls">
+            <button id="theme-toggle">🌙 Dark Mode</button>
+        </div>
+        <div class="header-main">
+            <img src="logo_header.svg" alt="The Movie Bot Logo" class="main-logo">
+            
+            <div class="search-box">
+                <select id="genre-dropdown">
+                    <option value="">Select Genre</option>
+                    <option value="28">Action</option>
+                    <option value="12">Adventure</option>
+                    <option value="16">Animation</option>
+                    <option value="35">Comedy</option>
+                    <option value="80">Crime</option>
+                    <option value="27">Horror</option>
+                    <option value="10749">Romance</option>
+                    <option value="878">Sci-Fi</option>
+                    <option value="37">Western</option>
+                </select>
+
+                <input type="text" id="search-input" placeholder="Search movie, genre, or mood...">
+                <button id="search-btn">Search</button>
+            </div>
+        </div>
+    </header>
+
+    <main id="movie-grid"></main>
+
+    <div class="load-more-container">
+        <button id="load-more" style="display: none;">Show Next 12 Movies</button>
+    </div>
+
+    <div id="movie-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <div id="modal-body"></div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
 
