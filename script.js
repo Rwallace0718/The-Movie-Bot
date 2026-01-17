@@ -1,6 +1,10 @@
-const TMDB_KEY = "0edd59a7f344fa2c15e57eaa38f20252";
-const OPENAI_KEY = "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";
-
+// Replace your old TMDB fetch with this:
+async function searchMovies(title) {
+    // We call OUR server, which has the key hidden!
+    const response = await fetch(`/api/movies?query=${encodeURIComponent(title)}`);
+    const data = await response.json();
+    return data.results; 
+}
 // If they are missing (locally), the app will prompt you or fail gracefully
 if (!TMDB_KEY || !OPENAI_KEY) {
     console.error("API Keys are missing. Make sure they are set in Vercel!");
@@ -203,5 +207,6 @@ document.querySelector('.close-modal').onclick = () => {
 window.onclick = (e) => {
     if (e.target.className === 'modal') document.getElementById('movie-modal').style.display = 'none';
 };
+
 
 
