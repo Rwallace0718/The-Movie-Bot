@@ -224,7 +224,12 @@ document.querySelector('.close-modal').onclick = () => {
 
 window.onclick = (e) => {
     if (e.target.className === 'modal') document.getElementById('movie-modal').style.display = 'none';
-};
+    const toggleBtn = document.getElementById('theme-toggle'); // Make sure this matches your HTML ID
+toggleBtn.addEventListener('click', () => {
+    document.body.classList.toggle('dark-mode');
+});
+}
+
 
 
 
