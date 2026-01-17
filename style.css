@@ -1,94 +1,125 @@
-/* 1. BASIC RESET & BODY */
+/* 1. Global Styles */
 body {
-    font-family: 'Segoe UI', Arial, sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     margin: 0;
-    padding: 20px;
-    background-color: #f4f4f9;
-    color: #333;
-    transition: background 0.3s, color 0.3s;
-    text-align: center;
+    padding: 0;
+    background-color: #f8f9fa;
+    color: #1a1a1a;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
-/* 2. DARK MODE THEME */
+/* 2. Dark Mode Colors */
 body.dark-mode {
-    background-color: #121212;
+    background-color: #0f0f0f;
     color: #ffffff;
 }
 
-/* 3. HEADER & CONTROLS */
+/* 3. Header & Navigation */
 header {
-    margin-bottom: 30px;
+    width: 100%;
+    padding: 20px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
 }
 
-.input-group, .filter-group {
-    margin: 15px 0;
-}
+h1 { margin: 0; font-size: 2.5rem; }
 
-input, select, button {
-    padding: 12px;
-    border-radius: 8px;
-    border: 1px solid #ddd;
-    font-size: 1rem;
-}
-
-button {
-    background-color: #e50914; /* Netflix Red */
+/* 4. Buttons & Inputs */
+#theme-toggle {
+    background: #e50914;
     color: white;
     border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: bold;
+    box-shadow: 0 4px 10px rgba(229, 9, 20, 0.3);
+}
+
+.search-section {
+    max-width: 600px;
+    width: 90%;
+    margin: 20px auto;
+}
+
+.input-group {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+input[type="text"] {
+    flex-grow: 1;
+    padding: 12px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    outline: none;
+}
+
+#search-button {
+    background: #e50914;
+    color: white;
+    border: none;
+    padding: 0 25px;
+    border-radius: 8px;
     cursor: pointer;
     font-weight: bold;
 }
 
-button:hover {
-    background-color: #b20710;
+select {
+    padding: 10px;
+    border-radius: 8px;
+    width: 100%;
+    max-width: 300px;
 }
 
-/* 4. THE MOVIE GRID (The Magic Fix) */
+/* 5. The Movie Grid (The Layout Fix) */
 #results-container {
     display: grid;
-    /* This creates the neat rows and columns */
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 25px;
-    padding: 20px;
+    gap: 30px;
+    padding: 40px;
+    width: 90%;
     max-width: 1200px;
-    margin: 0 auto;
 }
 
-/* 5. INDIVIDUAL MOVIE CARDS */
+/* 6. Movie Cards */
 .movie-card {
     background: white;
     border-radius: 12px;
     overflow: hidden;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.05);
     transition: transform 0.3s ease;
-    display: flex;
-    flex-direction: column;
+}
+
+body.dark-mode .movie-card {
+    background: #1e1e1e;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.4);
 }
 
 .movie-card:hover {
-    transform: scale(1.05);
+    transform: translateY(-10px);
 }
 
-/* This fixes the "One Huge Poster" problem */
 .movie-card img {
     width: 100%;
-    height: 300px;     /* Forces all posters to be the same size */
-    object-fit: cover; /* Crops the image to fit perfectly without stretching */
+    height: 300px;
+    object-fit: cover;
+    display: block;
 }
 
 .movie-info {
-    padding: 12px;
-    background: #fff;
-    color: #333;
+    padding: 15px;
+    text-align: center;
 }
 
-/* Dark Mode adjustment for Cards */
-body.dark-mode .movie-card {
-    background: #1e1e1e;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-}
-
-body.dark-mode .movie-info {
-    background: #1e1e1e;
-    color: #fff;
+.movie-info h3 {
+    margin: 0;
+    font-size: 1rem;
+    color: inherit;
 }
