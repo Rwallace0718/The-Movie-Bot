@@ -1,28 +1,15 @@
-// --- 1. THE SEARCH LOGIC (Talks to /api/movies.js) ---
-async function searchMovies(query) {
-    try {
-        console.log("Fetching movies for:", query);
-        const response = await fetch(`/api/movies?query=${encodeURIComponent(query)}`);
-        
-        if (!response.ok) throw new Error('API Folder not responding');
-        
-        const data = await response.json();
-        return data.results || [];
-    } catch (error) {
-        console.error("Movie Search Error:", error);
-        return [];
-    }
-}
+searchBtn.addEventListener('click', async () => {
+    const userInput = document.getElementById('movie-input').value;
+    resultsContainer.innerHTML = "<p>AI is thinking...</p>";
 
-// --- 2. THE AI LOGIC (Talks to /api/chat.js) ---
-async function getAIRecommendation(userInput) {
-    try {
-        console.log("Asking AI for recommendations...");
-        const response = await fetch('/api/chat', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message: userInput })
-        });
+    // 1. This part asks OpenAI for a list of movies
+    const aiSuggestion = await getAIRecommendation(userInput);
+    
+    // 2. This part takes those suggestions and finds them on TMDB
+    const movies = await searchMovies(aiSuggestion);
+
+    displayResults(movies);
+});
         
         const data = await response.json();
         // Returns the text recommendation from OpenAI
@@ -103,3 +90,4 @@ if (toggleBtn) {
         console.log("Theme toggled");
     });
 }
+
