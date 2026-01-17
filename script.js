@@ -1,11 +1,16 @@
 // 1. SEARCH MOVIES (TMDB)
-async function searchMovies(title) {
+async function searchMovies(query) {
     try {
-        const response = await fetch(`/api/movies?query=${encodeURIComponent(title)}`);
+        // We call our secret api folder instead of TMDB directly
+        const response = await fetch(`/api/movies?query=${encodeURIComponent(query)}`);
+        
+        if (!response.ok) throw new Error('Network response was not ok');
+        
         const data = await response.json();
-        return data.results; // This returns the list of movies
+        return data.results || [];
     } catch (error) {
-        console.error("Error searching movies:", error);
+        console.error("Movie Search Error:", error);
+        return [];
     }
 }
 
@@ -245,6 +250,7 @@ toggleBtn.addEventListener('click', () => {
     document.body.classList.toggle('dark-mode');
 });
 }
+
 
 
 
