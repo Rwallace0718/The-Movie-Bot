@@ -1,3 +1,4 @@
+console.log("Script is loaded!");
 window.addEventListener('DOMContentLoaded', () => {
     console.log("Movie Bot JavaScript: Active and Connected.");
 
@@ -117,3 +118,4 @@ window.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
