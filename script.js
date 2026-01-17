@@ -24,8 +24,16 @@ async function getAIRecommendation(userInput) {
     }
 }
 // If they are missing (locally), the app will prompt you or fail gracefully
-if (!TMDB_KEY || !OPENAI_KEY) {
-    console.error("API Keys are missing. Make sure they are set in Vercel!");
+async function searchMovies(query) {
+    try {
+        // Notice: No TMDB_KEY here! We call our own API folder instead.
+        const response = await fetch(`/api/movies?query=${encodeURIComponent(query)}`);
+        const data = await response.json();
+        return data.results || [];
+    } catch (error) {
+        console.error("Movie Search Error:", error);
+        return [];
+    }
 }
 // Rest of your code...
 let currentPage = 1;
@@ -229,6 +237,7 @@ toggleBtn.addEventListener('click', () => {
     document.body.classList.toggle('dark-mode');
 });
 }
+
 
 
 
