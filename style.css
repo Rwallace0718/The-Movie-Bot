@@ -248,3 +248,14 @@ header {
     margin: 10px;
     border-radius: 12px;
 }
+
+/* This tells the browser what to do when dark-mode is active */
+body.dark-mode {
+    background-color: #1a1a1a;
+    color: #ffffff;
+}
+
+body.dark-mode .movie-card {
+    background-color: #2d2d2d;
+    border: 1px solid #444;
+}
