@@ -1,6 +1,5 @@
-// This tells the script to look for the keys in the Vercel environment
-const TMDB_KEY = window.TMDB_API_KEY || ''; 
-const OPENAI_KEY = window.OPENAI_API_KEY || '';
+const TMDB_KEY = "0edd59a7f344fa2c15e57eaa38f20252";
+const OPENAI_KEY = "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";
 
 // If they are missing (locally), the app will prompt you or fail gracefully
 if (!TMDB_KEY || !OPENAI_KEY) {
@@ -204,4 +203,5 @@ document.querySelector('.close-modal').onclick = () => {
 window.onclick = (e) => {
     if (e.target.className === 'modal') document.getElementById('movie-modal').style.display = 'none';
 };
+
 
