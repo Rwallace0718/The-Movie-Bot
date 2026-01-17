@@ -75,9 +75,17 @@ function createStars() {
 }
 
 // --- 2. SEARCH & GENRE TRIGGERS ---
-document.getElementById('search-btn').addEventListener('click', () => {
-    const query = document.getElementById('search-input').value.trim();
-    if (!query) return;
+const genreDropdown = document.getElementById('genre-dropdown');
+
+if (genreDropdown) {
+    genreDropdown.addEventListener('change', async (event) => {
+        const selectedGenre = event.target.value;
+        const movies = await searchMovies(selectedGenre);
+        displayResults(movies);
+    });
+} else {
+    console.warn("Genre dropdown not found in HTML. Skipping listener.");
+}
 
     currentQuery = query;
     currentPage = 1;
@@ -237,6 +245,7 @@ toggleBtn.addEventListener('click', () => {
     document.body.classList.toggle('dark-mode');
 });
 }
+
 
 
 
