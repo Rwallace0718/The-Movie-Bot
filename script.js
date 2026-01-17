@@ -1,9 +1,27 @@
-// Replace your old TMDB fetch with this:
+// 1. SEARCH MOVIES (TMDB)
 async function searchMovies(title) {
-    // We call OUR server, which has the key hidden!
-    const response = await fetch(`/api/movies?query=${encodeURIComponent(title)}`);
-    const data = await response.json();
-    return data.results; 
+    try {
+        const response = await fetch(`/api/movies?query=${encodeURIComponent(title)}`);
+        const data = await response.json();
+        return data.results; // This returns the list of movies
+    } catch (error) {
+        console.error("Error searching movies:", error);
+    }
+}
+
+// 2. GET AI RECOMMENDATION (OPENAI)
+async function getAIRecommendation(userInput) {
+    try {
+        const response = await fetch('/api/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: userInput })
+        });
+        const data = await response.json();
+        return data.choices[0].message.content;
+    } catch (error) {
+        console.error("Error getting AI recommendation:", error);
+    }
 }
 // If they are missing (locally), the app will prompt you or fail gracefully
 if (!TMDB_KEY || !OPENAI_KEY) {
@@ -207,6 +225,7 @@ document.querySelector('.close-modal').onclick = () => {
 window.onclick = (e) => {
     if (e.target.className === 'modal') document.getElementById('movie-modal').style.display = 'none';
 };
+
 
 
 
