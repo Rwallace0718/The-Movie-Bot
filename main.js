@@ -27,15 +27,15 @@ window.addEventListener('DOMContentLoaded', () => {
         modal.className = 'movie-modal';
         modal.innerHTML = `
             <div class="modal-content">
-                <span class="close-button">&times;</span>
+                <span class="close-button" title="Close">&times;</span>
                 ${trailer ? 
-                    `<iframe width="100%" height="400" src="https://www.youtube.com/embed/${trailer.key}?autoplay=1" frameborder="0" allowfullscreen></iframe>` : 
+                    `<iframe width="100%" height="450" src="https://www.youtube.com/embed/${trailer.key}?autoplay=1" frameborder="0" allowfullscreen></iframe>` : 
                     '<div style="padding:40px; text-align:center;">No trailer found.</div>'}
                 <div class="modal-info" style="padding:25px; color: white;">
-                    <h2>${movie.title}</h2>
-                    <p>${movie.overview}</p>
+                    <h2 style="margin-top:0;">${movie.title}</h2>
+                    <p style="line-height:1.6; opacity:0.9;">${movie.overview}</p>
                     <div style="margin-top:20px;">
-                        <h3>Streaming on:</h3>
+                        <h3 style="margin-bottom:10px;">Streaming on:</h3>
                         <div class="provider-logos">
                             ${providers.map(p => `<img src="https://image.tmdb.org/t/p/original${p.logo_path}" title="${p.provider_name}">`).join('') || 'Check local listings'}
                         </div>
