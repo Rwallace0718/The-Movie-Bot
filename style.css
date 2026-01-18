@@ -1,3 +1,4 @@
+/* 1. STARRY ANIMATION */
 * { box-sizing: border-box; }
 
 body {
@@ -23,97 +24,59 @@ body {
 
 body.light-mode { background: #f0f4f8; color: #1a1a1a; background-image: none; }
 
-header {
-    width: 100%;
-    padding: 20px 4%;
-    display: flex;
-    justify-content: flex-end;
-}
-
-#theme-toggle {
-    background: #333; color: white; border: none;
-    padding: 10px 15px; border-radius: 50%;
-    cursor: pointer; font-size: 1.2rem; z-index: 10;
-}
-
-.hero-section {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 20px 20px 60px 20px;
-    text-align: center;
-}
-
-.main-logo {
-    width: 100%;
-    max-width: 500px;
-    height: auto;
-    margin-bottom: 20px;
-}
-
-.intro-text { font-size: 1.2rem; margin-bottom: 30px; opacity: 0.9; }
-
-.search-container { width: 100%; max-width: 600px; }
-
-.search-box {
-    display: flex;
-    background: rgba(255, 255, 255, 0.1);
-    border: 2px solid #e50914;
-    border-radius: 30px;
-    padding: 5px 5px 5px 20px;
-    margin-bottom: 15px;
-}
-
-.search-box input {
-    flex: 1; background: transparent; border: none;
-    color: white; font-size: 1rem; outline: none;
-}
-
-body.light-mode .search-box input { color: #1a1a1a; }
-
-#search-button {
-    background: #e50914; color: white; border: none;
-    padding: 12px 25px; border-radius: 25px;
-    font-weight: bold; cursor: pointer;
-}
-
-.filter-box select {
-    background: rgba(255, 255, 255, 0.1);
-    color: white; border: 1px solid #444;
-    padding: 10px 20px; border-radius: 20px;
-    width: 100%; max-width: 300px;
-}
-
-body.light-mode .filter-box select { color: #1a1a1a; background: #fff; }
-
+/* 2. MOVIE GRID */
 #results-container {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
     gap: 30px;
-    padding: 0 4% 50px 4%;
+    padding: 20px 4%;
 }
 
 .movie-card {
     background: rgba(255,255,255,0.05); border-radius: 12px;
     overflow: hidden; transition: 0.3s; border: 1px solid rgba(255,255,255,0.1);
 }
-
 .movie-card:hover { transform: translateY(-10px); border-color: #e50914; }
 
-.movie-card img { width: 100%; aspect-ratio: 2/3; object-fit: cover; }
-
-.movie-info { padding: 15px; text-align: center; }
-
-.details-btn {
-    background: #e50914; color: white; border: none;
-    padding: 8px 15px; border-radius: 5px; cursor: pointer; margin-top: 10px;
+/* 3. MODAL (POPUP) - COSMETIC FIX HERE */
+.movie-modal {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.9);
+    display: flex; justify-content: center; align-items: center;
+    z-index: 2000;
 }
 
-footer { padding: 40px; text-align: center; opacity: 0.6; font-size: 0.9rem; }
+.modal-content {
+    background: #181818; width: 90%; max-width: 800px;
+    border-radius: 15px; position: relative; overflow: hidden;
+    box-shadow: 0 0 30px rgba(0,0,0,0.5);
+}
 
-/* MODAL STYLES */
-.movie-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); display: flex; justify-content: center; align-items: center; z-index: 3000; }
-.modal-content { background: #111; width: 95%; max-width: 800px; border-radius: 15px; position: relative; overflow: hidden; color: white; }
-.close-button { position: absolute; top: 15px; right: 20px; font-size: 35px; color: white; cursor: pointer; z-index: 3001; }
-.modal-info { padding: 25px; }
-.provider-logos img { width: 45px; height: 45px; border-radius: 8px; margin-right: 10px; margin-top: 10px; }
+/* Updated Close Button to avoid YouTube overlap */
+.close-button {
+    position: absolute; 
+    top: 15px; 
+    right: 15px;
+    font-size: 30px; 
+    color: white; 
+    cursor: pointer; 
+    z-index: 2100;
+    background: rgba(229, 9, 20, 0.8); /* Netflix Red with transparency */
+    width: 45px;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: 0.2s;
+    line-height: 0;
+    padding-bottom: 4px; /* Adjusts the 'X' vertically */
+}
+
+.close-button:hover {
+    background: #e50914;
+    transform: scale(1.1);
+}
+
+.provider-logos img { width: 45px; margin-right: 10px; border-radius: 8px; }
