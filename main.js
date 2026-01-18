@@ -16,8 +16,13 @@ window.addEventListener('DOMContentLoaded', () => {
         let url = `/api/movies?query=${encodeURIComponent(query)}&page=${page}`;
         if (mode === 'genre') url = `/api/movies?genre=${query}&page=${page}`;
         if (mode === 'id') url = `/api/movies?id=${query}&append=videos,watch/providers`;
-        const response = await fetch(url);
-        return await response.json();
+        
+        try {
+            const response = await fetch(url);
+            return await response.json();
+        } catch (e) {
+            return { results: [] };
+        }
     }
 
     async function showMovieDetails(movieId) {
@@ -32,7 +37,9 @@ window.addEventListener('DOMContentLoaded', () => {
                 <div class="modal-header">
                     <button class="close-button">&times;</button>
                 </div>
-                ${trailer ? `<iframe width="100%" height="450" src="https://www.youtube.com/embed/${trailer.key}?autoplay=1" frameborder="0" allowfullscreen></iframe>` : '<div style="padding:60px; text-align:center;">Trailer not found.</div>'}
+                <div class="video-container">
+                    ${trailer ? `<iframe width="100%" height="450" src="https://www.youtube.com/embed/${trailer.key}?autoplay=1" frameborder="0" allowfullscreen></iframe>` : '<div style="padding:60px; text-align:center;">Trailer not available.</div>'}
+                </div>
                 <div style="padding:25px; color: white;">
                     <h2 style="margin:0 0 10px 0;">${movie.title}</h2>
                     <p style="opacity:0.8; line-height:1.5;">${movie.overview}</p>
@@ -49,7 +56,10 @@ window.addEventListener('DOMContentLoaded', () => {
 
     function displayMovies(data, append = false) {
         const movies = data.results || [];
-        if (!append) resultsContainer.innerHTML = "";
+        if (!append) {
+            resultsContainer.innerHTML = "";
+            window.scrollTo(0, 0);
+        }
 
         movies.forEach(movie => {
             const card = document.createElement('div');
@@ -69,16 +79,33 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 
     searchBtn.onclick = async () => {
-        const val = movieInput.value;
+        const val = movieInput.value.trim();
         if (!val) return;
-        resultsContainer.innerHTML = "<p style='grid-column: 1/-1; text-align:center;'>Searching...</p>";
-        const aiRes = await fetch('/api/chat', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ message: val }) });
-        const aiData = await aiRes.json();
-        const recommendation = aiData.choices[0].message.content;
-        currentPage = 1; currentQuery = recommendation; currentMode = 'search';
-        const movieData = await fetchMovies(recommendation, 'search');
-        displayMovies(movieData);
-        titleElement.innerText = "Suggested: " + recommendation;
+        
+        resultsContainer.innerHTML = "<p style='grid-column: 1/-1; text-align:center;'>Consulting the AI Movie Guru...</p>";
+        
+        let recommendation = val; // Default fallback
+        try {
+            const aiRes = await fetch('/api/chat', { 
+                method: 'POST', 
+                headers: {'Content-Type': 'application/json'}, 
+                body: JSON.stringify({ message: val }) 
+            });
+            
+            if (aiRes.ok) {
+                const aiData = await aiRes.json();
+                recommendation = aiData.choices[0].message.content;
+            }
+        } catch (e) {
+            console.log("AI Fallback engaged");
+        }
+
+        currentPage = 1; 
+        currentQuery = recommendation; 
+        currentMode = 'search';
+        const data = await fetchMovies(recommendation, 'search');
+        displayMovies(data);
+        titleElement.innerText = "Results for: " + recommendation;
     };
 
     genreDropdown.onchange = async (e) => {
