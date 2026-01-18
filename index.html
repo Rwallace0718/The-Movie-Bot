@@ -3,58 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Movie Bot | AI Cinema Guide</title>
+    <title>The Movie Bot</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
-
     <header>
         <div class="top-bar">
-            <button id="theme-toggle" title="Toggle Light/Dark Mode">🌓</button>
+            <button id="theme-toggle">🌓 Toggle Theme</button>
         </div>
     </header>
 
     <main>
         <div class="hero-section">
-            <img src="logo_header.svg" alt="The Movie Bot Logo" class="main-logo">
-            
-            <p class="intro-text">Tell the AI your mood or a movie you like, and I'll find your next watch!</p>
-
+            <img src="logo_header.svg" alt="Logo" class="main-logo">
             <div class="search-container">
                 <div class="search-box">
-                    <input type="text" id="movie-input" placeholder="What are you in the mood for?">
+                    <input type="text" id="movie-input" placeholder="Search a mood...">
                     <button id="search-button">Search AI</button>
                 </div>
-
                 <div class="filter-box">
                     <select id="genre-dropdown">
-                        <option value="">-- Or browse by genre --</option>
+                        <option value="">-- Select Genre --</option>
                         <option value="28">Action</option>
                         <option value="35">Comedy</option>
                         <option value="27">Horror</option>
                         <option value="18">Drama</option>
                         <option value="878">Sci-Fi</option>
-                        <option value="10749">Romance</option>
-                        <option value="16">Animation</option>
-                        <option value="53">Thriller</option>
-                        <option value="99">Documentary</option>
                     </select>
                 </div>
             </div>
         </div>
-
-        <div id="results-title-container" style="padding: 0 4%; margin-bottom: 20px;">
-            <h2 id="current-view-title" style="font-size: 1.5rem; opacity: 0.8;">Trending Now</h2>
-        </div>
-
-        <div id="results-container">
-            </div>
+        <h2 id="current-view-title" style="text-align:center;">Trending</h2>
+        <div id="results-container"></div>
     </main>
-
-    <footer>
-        <p>Built with AI &bull; Powered by TMDB & OpenAI</p>
-    </footer>
 
     <script src="main.js"></script>
 </body>
