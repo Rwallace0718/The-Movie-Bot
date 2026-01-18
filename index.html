@@ -8,55 +8,46 @@
 </head>
 <body>
 
-   <header>
-    <div class="header-content">
-        <img src="logo_header.svg" alt="The Movie Bot Logo" style="max-width: 300px; height: auto;">
-        <div class="theme-wrapper">
-            <button id="theme-toggle" aria-label="Toggle Dark Mode">🌓 Toggle Theme</button>
+    <header>
+        <div class="header-content">
+            <img src="logo_header.svg" alt="The Movie Bot Logo" class="main-logo">
+            <button id="theme-toggle">🌓 Toggle Theme</button>
         </div>
-    </div>
-</header>
+    </header>
 
-   <main>
-    <section class="search-container">
-        <div class="hero-text">
-            <h1>🎬 The Movie Bot</h1>
-            <p class="subtitle">Tell the AI your mood or a movie you like, and I'll find your next watch!</p>
-        </div>
+    <main>
+        <section class="search-section">
+            <p>Tell the AI your mood or a movie you like, and I'll find your next watch!</p>
+            
+            <div class="input-group">
+                <input type="text" id="movie-input" placeholder="e.g. Something space-themed and exciting...">
+                <button id="search-button">Search AI</button>
+            </div>
 
-        <div class="search-wrapper">
-            <input type="text" id="movie-input" placeholder="e.g. Something space-themed and exciting...">
-            <button id="search-button">Search AI</button>
-        </div>
-
-        <div class="filter-wrapper">
-            <label for="genre-dropdown">Or browse by genre:</label>
             <div class="filter-group">
-    <label for="genre-dropdown">Browse by Genre:</label>
-    <select id="genre-dropdown">
-        <option value="">-- Select a Genre --</option>
-        <option value="28">Action</option>
-        <option value="35">Comedy</option>
-        <option value="27">Horror</option>
-        <option value="18">Drama</option>
-        <option value="878">Sci-Fi</option>
-        <option value="10749">Romance</option>
-        <option value="16">Animation</option>
-    </select>
-</div>
-        </div>
-    </section>
+                <label for="genre-dropdown">Or browse by genre:</label>
+                <select id="genre-dropdown">
+                    <option value="">-- Select a Genre --</option>
+                    <option value="28">Action</option>
+                    <option value="35">Comedy</option>
+                    <option value="27">Horror</option>
+                    <option value="18">Drama</option>
+                    <option value="878">Sci-Fi</option>
+                    <option value="10749">Romance</option>
+                    <option value="16">Animation</option>
+                </select>
+            </div>
+        </section>
 
-    <div id="results-container"></div>
-</main>
+        <div id="results-container">
+            <p class="placeholder-text">Your recommendations will appear here...</p>
+        </div>
+    </main>
+
     <footer>
         <p>Powered by OpenAI & TMDB</p>
     </footer>
 
-   <script src="main.js"></script>
+    <script src="main.js"></script>
 </body>
 </html>
-
-
-
-
