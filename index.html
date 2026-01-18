@@ -4,27 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The Movie Bot</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-    <header>
-        <button id="theme-toggle">🌓 Toggle Theme</button>
+    <header style="display: flex; justify-content: flex-end; padding: 20px;">
+        <button id="theme-toggle" style="cursor:pointer; z-index: 100;">🌓 Toggle Theme</button>
     </header>
 
     <main>
-        <div class="hero-section">
-            <img src="logo_header.svg" alt="The Movie Bot" class="main-logo">
+        <div class="hero-section" style="text-align: center; padding-top: 50px;">
+            <img src="logo_header.svg" alt="The Movie Bot" style="max-width: 400px; width: 100%;">
             
-            <div class="search-container">
-                <div class="search-box">
-                    <input type="text" id="movie-input" placeholder="What's the vibe?">
-                    <button id="search-button">Search AI</button>
+            <div class="search-container" style="margin-top: 30px;">
+                <div class="search-box" style="display: inline-flex; border: 2px solid red; border-radius: 30px; padding: 5px; background: rgba(255,255,255,0.1);">
+                    <input type="text" id="movie-input" placeholder="What's the vibe?" style="background: transparent; border: none; color: white; padding: 10px; width: 250px; outline: none;">
+                    <button id="search-button" style="background: red; color: white; border: none; border-radius: 20px; padding: 10px 20px; cursor: pointer;">Search AI</button>
                 </div>
 
-                <div class="filter-box">
-                    <select id="genre-dropdown">
+                <div class="filter-box" style="margin-top: 20px;">
+                    <select id="genre-dropdown" style="padding: 10px; border-radius: 10px; background: #222; color: white;">
                         <option value="">-- Browse Genres --</option>
                         <option value="28">Action</option>
                         <option value="35">Comedy</option>
@@ -37,7 +35,7 @@
             </div>
         </div>
 
-        <h2 id="current-view-title">Trending Now</h2>
+        <h2 id="current-view-title" style="text-align: center; margin-top: 40px;">Trending Now</h2>
         <div id="results-container"></div>
     </main>
 
