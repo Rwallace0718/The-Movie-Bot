@@ -105,3 +105,41 @@ main {
 
 .movie-info { padding: 10px; }
 .movie-info h3 { margin: 0; font-size: 0.9rem; }
+
+/* Modal Background */
+.movie-modal {
+    position: fixed;
+    z-index: 2000;
+    left: 0; top: 0;
+    width: 100%; height: 100%;
+    background-color: rgba(0,0,0,0.9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Modal Content Box */
+.modal-content {
+    background-color: #1c1c1c;
+    width: 90%; max-width: 800px;
+    border-radius: 10px;
+    position: relative;
+    padding-bottom: 20px;
+    color: white;
+}
+
+.close-button {
+    position: absolute;
+    right: 20px; top: 10px;
+    font-size: 30px; cursor: pointer;
+    z-index: 2001;
+}
+
+.modal-info { padding: 20px; }
+
+.provider-logos img {
+    width: 45px;
+    height: 45px;
+    border-radius: 8px;
+    margin-right: 10px;
+}
