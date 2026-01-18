@@ -16,15 +16,15 @@
     </header>
 
     <main>
-        <section class="search-section">
-            <p>Tell the AI your mood or a movie you like, and I'll find your next watch!</p>
+        <div class="app-container">
+            <p class="intro-text">Tell the AI your mood or a movie you like, and I'll find your next watch!</p>
             
-            <div class="input-group">
+            <div class="search-container">
                 <input type="text" id="movie-input" placeholder="e.g. Something space-themed and exciting...">
                 <button id="search-button">Search AI</button>
             </div>
 
-            <div class="filter-group">
+            <div class="filter-container">
                 <label for="genre-dropdown">Or browse by genre:</label>
                 <select id="genre-dropdown">
                     <option value="">-- Select a Genre --</option>
@@ -37,10 +37,10 @@
                     <option value="16">Animation</option>
                 </select>
             </div>
-        </section>
 
-        <div id="results-container">
-            <p class="placeholder-text">Your recommendations will appear here...</p>
+            <div id="results-container">
+                <p class="placeholder-text">Your recommendations will appear here...</p>
+            </div>
         </div>
     </main>
 
