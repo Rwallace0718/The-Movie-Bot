@@ -1,129 +1,82 @@
-console.log("Script is loaded!");
 window.addEventListener('DOMContentLoaded', () => {
     console.log("Movie Bot JavaScript: Active and Connected.");
 
-    // --- 1. CONFIGURATION (Talks to your Vercel API folders) ---
     const API_PATHS = {
         chat: '/api/chat',
         movies: '/api/movies'
     };
 
-    // --- 2. THE MOVIE SEARCH ENGINE ---
-    async function fetchMoviesFromTMDB(searchTerm) {
+    async function fetchMovies(query, isGenre = false) {
         try {
-            console.log("Searching TMDB for:", searchTerm);
-            const response = await fetch(`${API_PATHS.movies}?query=${encodeURIComponent(searchTerm)}`);
+            // If it's a genre, we send ?genre=ID. If it's search, we send ?query=text
+            const param = isGenre ? `genre=${query}` : `query=${encodeURIComponent(query)}`;
+            const response = await fetch(`${API_PATHS.movies}?${param}`);
             const data = await response.json();
             return data.results || [];
         } catch (error) {
-            console.error("TMDB Error:", error);
+            console.error("Fetch Error:", error);
             return [];
         }
     }
 
-    // --- 3. THE AI BRAIN ---
-    async function getAIRecommendations(userInput) {
-        try {
-            console.log("Asking AI for advice on:", userInput);
-            const response = await fetch(API_PATHS.chat, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: userInput })
-            });
-            const data = await response.json();
-            // Returns the movie names suggested by OpenAI
-            return data.choices[0].message.content;
-        } catch (error) {
-            console.error("AI Error:", error);
-            return userInput; // Fallback to raw input if AI fails
-        }
-    }
-
-    // --- 4. THE DISPLAY ENGINE ---
     function displayMovies(movies) {
-        const resultsContainer = document.getElementById('results-container');
-        if (!resultsContainer) return;
-
-        resultsContainer.innerHTML = ""; // Clear the "Thinking..." message
+        const container = document.getElementById('results-container');
+        if (!container) return;
+        container.innerHTML = "";
 
         if (movies.length === 0) {
-            resultsContainer.innerHTML = "<p>No results found. Try a different mood!</p>";
+            container.innerHTML = "<p>No movies found. Try another search!</p>";
             return;
         }
 
         movies.forEach(movie => {
             const card = document.createElement('div');
             card.className = 'movie-card';
-            
-            const posterPath = movie.poster_path 
+            const poster = movie.poster_path 
                 ? `https://image.tmdb.org/t/p/w300${movie.poster_path}` 
                 : 'https://via.placeholder.com/300x450?text=No+Poster';
 
             card.innerHTML = `
-                <img src="${posterPath}" alt="${movie.title}">
+                <img src="${poster}" alt="${movie.title}">
                 <div class="movie-info">
                     <h3>${movie.title}</h3>
                     <p>${movie.release_date ? movie.release_date.split('-')[0] : 'N/A'}</p>
                 </div>
             `;
-            resultsContainer.appendChild(card);
+            container.appendChild(card);
         });
     }
 
-    // --- 5. BUTTON LISTENERS (The Wiring) ---
-
-    // A. The Search Button
-    const searchBtn = document.getElementById('search-button');
-    if (searchBtn) {
-        searchBtn.addEventListener('click', async () => {
-            const movieInput = document.getElementById('movie-input');
-            const resultsContainer = document.getElementById('results-container');
-
-            if (!movieInput.value) return alert("Please type a mood or genre first!");
-
-            resultsContainer.innerHTML = "<p class='loading-text'>Consulting the Movie Oracle...</p>";
-
-            // Step 1: Ask AI what we should search for
-            const aiAdvice = await getAIRecommendations(movieInput.value);
-            
-            // Step 2: Search TMDB for those specific recommendations
-            const movies = await fetchMoviesFromTMDB(aiAdvice);
-
-            // Step 3: Show them on screen
-            displayMovies(movies);
+    // Search Button Logic
+    document.getElementById('search-button')?.addEventListener('click', async () => {
+        const input = document.getElementById('movie-input').value;
+        if (!input) return alert("Please enter a mood!");
+        
+        document.getElementById('results-container').innerHTML = "<p>Consulting the Movie Oracle...</p>";
+        
+        // AI Logic
+        const aiResponse = await fetch(API_PATHS.chat, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: input })
         });
-    }
+        const aiData = await aiResponse.json();
+        const recommendation = aiData.choices[0].message.content;
 
-    // B. The Genre Dropdown
-  // Replace your existing genreDropdown listener with this:
-const genreDropdown = document.getElementById('genre-dropdown');
-if (genreDropdown) {
-    genreDropdown.addEventListener('change', async (event) => {
-        const genreId = event.target.value;
-        if (!genreId) return;
-
-        const resultsContainer = document.getElementById('results-container');
-        resultsContainer.innerHTML = "<p>Loading the best movies in this genre...</p>";
-
-        // We use a different API path for Genres to avoid the "name in title" bug
-        try {
-            const response = await fetch(`/api/movies?genre=${genreId}`);
-            const data = await response.json();
-            displayMovies(data.results || []);
-        } catch (error) {
-            console.error("Genre Fetch Error:", error);
-        }
+        const movies = await fetchMovies(recommendation);
+        displayMovies(movies);
     });
-}
 
-    // C. Light/Dark Mode Toggle
-    const themeBtn = document.getElementById('theme-toggle');
-    if (themeBtn) {
-        themeBtn.addEventListener('click', () => {
-            document.body.classList.toggle('dark-mode');
-            console.log("Theme switched!");
-        });
-    }
+    // Genre Dropdown Logic (The Bug Fix)
+    document.getElementById('genre-dropdown')?.addEventListener('change', async (e) => {
+        if (!e.target.value) return;
+        document.getElementById('results-container').innerHTML = "<p>Loading Genre...</p>";
+        const movies = await fetchMovies(e.target.value, true); // 'true' tells it to use Genre ID
+        displayMovies(movies);
+    });
+
+    // Theme Toggle
+    document.getElementById('theme-toggle')?.addEventListener('click', () => {
+        document.body.classList.toggle('dark-mode');
+    });
 });
-
-
