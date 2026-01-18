@@ -10,20 +10,25 @@
 <body>
 
     <header>
-        <div class="nav-container">
-            <div class="logo-area">
-                <img src="logo_header.svg" alt="The Movie Bot Logo" class="main-logo">
-            </div>
+        <div class="top-bar">
+            <button id="theme-toggle" title="Toggle Light/Dark Mode">🌓</button>
+        </div>
+    </header>
 
-            <div class="controls-wrapper">
+    <main>
+        <div class="hero-section">
+            <img src="logo_header.svg" alt="The Movie Bot Logo" class="main-logo">
+            <p class="intro-text">Tell the AI your mood or a movie you like, and I'll find your next watch!</p>
+
+            <div class="search-container">
                 <div class="search-box">
-                    <input type="text" id="movie-input" placeholder="Search a mood or vibe...">
+                    <input type="text" id="movie-input" placeholder="What are you in the mood for?">
                     <button id="search-button">Search AI</button>
                 </div>
 
                 <div class="filter-box">
                     <select id="genre-dropdown">
-                        <option value="">All Genres</option>
+                        <option value="">Or browse by genre...</option>
                         <option value="28">Action</option>
                         <option value="35">Comedy</option>
                         <option value="27">Horror</option>
@@ -33,20 +38,10 @@
                         <option value="16">Animation</option>
                     </select>
                 </div>
-
-                <button id="theme-toggle" title="Toggle Light/Dark Mode">🌓</button>
             </div>
         </div>
-    </header>
 
-    <main>
-        <div class="results-header">
-            <h2 id="view-title">Recommendations</h2>
-        </div>
-
-        <div id="results-container">
-            <p class="placeholder-text">The stars are aligning... search for a movie to begin.</p>
-        </div>
+        <div id="results-container"></div>
     </main>
 
     <footer>
