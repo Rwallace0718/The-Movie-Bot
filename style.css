@@ -1,15 +1,12 @@
-/* 1. STARRY ANIMATION & BASE */
 * { box-sizing: border-box; }
 
 body {
-    margin: 0;
-    padding: 0;
+    margin: 0; padding: 0;
     font-family: 'Inter', sans-serif;
     background-color: #000;
     color: white;
     min-height: 100vh;
     overflow-x: hidden;
-    /* Starry Background Logic */
     background-image: 
         radial-gradient(white, rgba(255,255,255,.2) 2px, transparent 40px),
         radial-gradient(white, rgba(255,255,255,.15) 1px, transparent 30px),
@@ -24,93 +21,81 @@ body {
     to { background-position: 1000px 1000px; }
 }
 
-/* Light Mode Override */
-body.light-mode {
-    background: #f0f4f8;
-    color: #1a1a1a;
-    background-image: none;
-}
+body.light-mode { background: #f0f4f8; color: #1a1a1a; background-image: none; }
 
-/* 2. HEADER NAVIGATION */
 header {
-    background: rgba(0, 0, 0, 0.85);
-    backdrop-filter: blur(10px);
-    padding: 10px 4%;
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
+    width: 100%;
+    padding: 20px 4%;
+    display: flex;
+    justify-content: flex-end;
 }
 
-.nav-container {
+#theme-toggle {
+    background: #333; color: white; border: none;
+    padding: 10px 15px; border-radius: 50%;
+    cursor: pointer; font-size: 1.2rem; z-index: 10;
+}
+
+.hero-section {
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
     align-items: center;
-    max-width: 1600px;
-    margin: 0 auto;
+    padding: 20px 20px 60px 20px;
+    text-align: center;
 }
 
 .main-logo {
-    height: 70px; /* Increased for visibility */
-    width: auto;
+    width: 100%;
+    max-width: 500px;
+    height: auto;
+    margin-bottom: 20px;
 }
 
-.controls-wrapper {
-    display: flex;
-    gap: 15px;
-    align-items: center;
-}
+.intro-text { font-size: 1.2rem; margin-bottom: 30px; opacity: 0.9; }
 
-/* 3. INPUTS & BUTTONS */
+.search-container { width: 100%; max-width: 600px; }
+
 .search-box {
     display: flex;
-    background: rgba(255,255,255,0.1);
-    border: 1px solid #e50914;
-    border-radius: 25px;
-    overflow: hidden;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid #e50914;
+    border-radius: 30px;
+    padding: 5px 5px 5px 20px;
+    margin-bottom: 15px;
 }
 
 .search-box input {
-    background: transparent;
-    border: none;
-    color: white;
-    padding: 10px 15px;
-    width: 200px;
-    outline: none;
+    flex: 1; background: transparent; border: none;
+    color: white; font-size: 1rem; outline: none;
 }
 
 body.light-mode .search-box input { color: #1a1a1a; }
 
-#search-button, #theme-toggle {
-    background: #e50914;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 25px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: 0.3s ease;
+#search-button {
+    background: #e50914; color: white; border: none;
+    padding: 12px 25px; border-radius: 25px;
+    font-weight: bold; cursor: pointer;
 }
 
-#theme-toggle { background: #333; }
-#theme-toggle:hover { background: #555; }
+.filter-box select {
+    background: rgba(255, 255, 255, 0.1);
+    color: white; border: 1px solid #444;
+    padding: 10px 20px; border-radius: 20px;
+    width: 100%; max-width: 300px;
+}
 
-/* 4. MOVIE GRID */
-main { padding: 40px 4%; }
+body.light-mode .filter-box select { color: #1a1a1a; background: #fff; }
 
 #results-container {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
     gap: 30px;
+    padding: 0 4% 50px 4%;
 }
 
-/* 5. MOVIE CARDS */
 .movie-card {
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 12px;
-    overflow: hidden;
-    transition: transform 0.3s ease;
-    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.05); border-radius: 12px;
+    overflow: hidden; transition: 0.3s; border: 1px solid rgba(255,255,255,0.1);
 }
 
 .movie-card:hover { transform: translateY(-10px); border-color: #e50914; }
@@ -120,41 +105,15 @@ main { padding: 40px 4%; }
 .movie-info { padding: 15px; text-align: center; }
 
 .details-btn {
-    background: #e50914;
-    color: white;
-    border: none;
-    padding: 8px 15px;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-top: 10px;
+    background: #e50914; color: white; border: none;
+    padding: 8px 15px; border-radius: 5px; cursor: pointer; margin-top: 10px;
 }
 
-/* 6. MODAL POPUP */
-.movie-modal {
-    position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.95);
-    display: flex; justify-content: center; align-items: center;
-    z-index: 3000;
-}
+footer { padding: 40px; text-align: center; opacity: 0.6; font-size: 0.9rem; }
 
-.modal-content {
-    background: #111;
-    width: 90%; max-width: 800px;
-    border-radius: 15px;
-    position: relative;
-    overflow: hidden;
-    color: white;
-}
-
-.close-button {
-    position: absolute; top: 15px; right: 20px;
-    font-size: 35px; color: white; cursor: pointer;
-    z-index: 3001;
-}
-
+/* MODAL STYLES */
+.movie-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); display: flex; justify-content: center; align-items: center; z-index: 3000; }
+.modal-content { background: #111; width: 95%; max-width: 800px; border-radius: 15px; position: relative; overflow: hidden; color: white; }
+.close-button { position: absolute; top: 15px; right: 20px; font-size: 35px; color: white; cursor: pointer; z-index: 3001; }
 .modal-info { padding: 25px; }
-
-.provider-logos img {
-    width: 45px; height: 45px; border-radius: 8px; margin-right: 10px;
-}
+.provider-logos img { width: 45px; height: 45px; border-radius: 8px; margin-right: 10px; margin-top: 10px; }
