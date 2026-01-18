@@ -3,49 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Movie Bot</title>
+    <title>The Movie Bot | AI Recommendations</title>
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
 </head>
-<body>
+<body class="dark-mode"> <header>
+        <div class="nav-container">
+            <div class="logo-area">
+                <img src="logo_header.svg" alt="The Movie Bot Logo" class="main-logo">
+            </div>
 
-    <header>
-        <div class="header-content">
-            <img src="logo_header.svg" alt="The Movie Bot Logo" class="main-logo">
-            <button id="theme-toggle">🌓 Toggle Theme</button>
+            <div class="controls-wrapper">
+                <div class="search-box">
+                    <input type="text" id="movie-input" placeholder="What are you in the mood for?">
+                    <button id="search-button">Search AI</button>
+                </div>
+
+                <div class="filter-box">
+                    <select id="genre-dropdown">
+                        <option value="">All Genres</option>
+                        <option value="28">Action</option>
+                        <option value="35">Comedy</option>
+                        <option value="27">Horror</option>
+                        <option value="18">Drama</option>
+                        <option value="878">Sci-Fi</option>
+                        <option value="10749">Romance</option>
+                        <option value="16">Animation</option>
+                    </select>
+                </div>
+
+                <button id="theme-toggle" title="Toggle Light/Dark Mode">🌓</button>
+            </div>
         </div>
     </header>
 
     <main>
-        <div class="app-container">
-            <p class="intro-text">Tell the AI your mood or a movie you like, and I'll find your next watch!</p>
-            
-            <div class="search-container">
-                <input type="text" id="movie-input" placeholder="e.g. Something space-themed and exciting...">
-                <button id="search-button">Search AI</button>
-            </div>
+        <div class="results-header">
+            <h2 id="view-title">Trending for You</h2>
+        </div>
 
-            <div class="filter-container">
-                <label for="genre-dropdown">Or browse by genre:</label>
-                <select id="genre-dropdown">
-                    <option value="">-- Select a Genre --</option>
-                    <option value="28">Action</option>
-                    <option value="35">Comedy</option>
-                    <option value="27">Horror</option>
-                    <option value="18">Drama</option>
-                    <option value="878">Sci-Fi</option>
-                    <option value="10749">Romance</option>
-                    <option value="16">Animation</option>
-                </select>
-            </div>
-
-            <div id="results-container">
-                <p class="placeholder-text">Your recommendations will appear here...</p>
-            </div>
+        <div id="results-container">
+            <p class="placeholder-text">Type a mood above to begin...</p>
         </div>
     </main>
 
     <footer>
-        <p>Powered by OpenAI & TMDB</p>
+        <p>Built with AI &bull; Powered by TMDB & OpenAI</p>
     </footer>
 
     <script src="main.js"></script>
