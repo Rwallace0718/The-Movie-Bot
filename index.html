@@ -10,35 +10,42 @@
 <body>
 
     <header style="display: flex; justify-content: flex-end; padding: 20px;">
-        <button id="theme-toggle" style="cursor:pointer; z-index: 100; padding: 10px 20px; border-radius: 20px; border: none; background: #333; color: white;">🌓 Toggle Theme</button>
+        <button id="theme-toggle" style="cursor:pointer; z-index: 100; padding: 10px 20px; border-radius: 20px; border: none; background: #333; color: white; font-weight: bold;">🌓 Toggle Theme</button>
     </header>
 
     <main>
-        <div class="hero-section" style="text-align: center; padding-top: 50px;">
-            <img src="logo_header.svg" alt="The Movie Bot" style="max-width: 400px; width: 100%;">
+        <div class="hero-section" style="text-align: center; padding-top: 20px;">
+            <img src="logo_header.svg" alt="The Movie Bot" class="main-logo" style="max-width: 400px; width: 100%; transition: transform 0.3s ease;">
             
-            <div class="search-container" style="margin-top: 30px;">
-                <div class="search-box" style="display: inline-flex; border: 2px solid #e50914; border-radius: 30px; padding: 5px; background: rgba(255,255,255,0.1);">
-                    <input type="text" id="movie-input" placeholder="What's the vibe?" style="background: transparent; border: none; color: white; padding: 10px; width: 250px; outline: none;">
-                    <button id="search-button" style="background: #e50914; color: white; border: none; border-radius: 20px; padding: 10px 20px; cursor: pointer; font-weight: bold;">Search AI</button>
+            <div class="search-container" style="margin-top: 30px; display: flex; flex-direction: column; align-items: center; gap: 15px;">
+                <div class="search-box" style="display: inline-flex; border: 2px solid #e50914; border-radius: 30px; padding: 5px; background: rgba(255,255,255,0.1); width: 90%; max-width: 500px;">
+                    <input type="text" id="movie-input" placeholder="What are you in the mood for?" style="background: transparent; border: none; color: white; padding: 10px 15px; flex: 1; outline: none; font-size: 1rem;">
+                    <button id="search-button" style="background: #e50914; color: white; border: none; border-radius: 25px; padding: 10px 25px; cursor: pointer; font-weight: bold;">Search AI</button>
                 </div>
 
-                <div class="filter-box" style="margin-top: 20px;">
-                    <select id="genre-dropdown" style="padding: 10px 20px; border-radius: 20px; background: #222; color: white; border: 1px solid #444; cursor: pointer;">
-                        <option value="">-- Browse Genres --</option>
+                <div class="filter-box">
+                    <select id="genre-dropdown" style="padding: 12px 25px; border-radius: 25px; background: #1a1a1a; color: white; border: 1px solid #444; cursor: pointer; font-size: 0.9rem;">
+                        <option value="">-- Browse by Genre --</option>
                         <option value="28">Action</option>
                         <option value="35">Comedy</option>
                         <option value="27">Horror</option>
                         <option value="18">Drama</option>
                         <option value="878">Sci-Fi</option>
                         <option value="16">Animation</option>
+                        <option value="53">Thriller</option>
                     </select>
                 </div>
             </div>
         </div>
 
-        <h2 id="current-view-title" style="text-align: center; margin-top: 40px;">Trending Now</h2>
-        <div id="results-container"></div>
+        <h2 id="current-view-title" style="text-align: center; margin-top: 50px; font-size: 1.8rem; letter-spacing: 1px;">Trending for You</h2>
+        
+        <div id="results-container">
+            </div>
+
+        <div class="more-container" style="text-align: center; padding: 50px 0;">
+            <button id="load-more-btn" style="display: none; background: transparent; color: #e50914; border: 2px solid #e50914; padding: 12px 35px; border-radius: 30px; font-weight: bold; cursor: pointer; transition: 0.3s;">Show More Results</button>
+        </div>
     </main>
 
     <script src="main.js"></script>
