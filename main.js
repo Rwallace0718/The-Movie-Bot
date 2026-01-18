@@ -8,7 +8,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
     let currentPage = 1;
     let currentQuery = 'trending';
-    let currentMode = 'trending'; // 'trending', 'search', or 'genre'
+    let currentMode = 'trending'; 
 
     document.getElementById('theme-toggle').onclick = () => document.body.classList.toggle('light-mode');
 
@@ -36,7 +36,7 @@ window.addEventListener('DOMContentLoaded', () => {
         modal.innerHTML = `
             <div class="modal-content">
                 <span class="close-button">&times;</span>
-                ${trailer ? `<iframe width="100%" height="450" src="https://www.youtube.com/embed/${trailer.key}?autoplay=1" frameborder="0" allowfullscreen style="border-radius: 15px 15px 0 0;"></iframe>` : '<div style="padding:60px; text-align:center;">Trailer not available.</div>'}
+                ${trailer ? `<iframe width="100%" height="450" src="https://www.youtube.com/embed/${trailer.key}?autoplay=1" frameborder="0" allowfullscreen></iframe>` : '<div style="padding:60px; text-align:center;">Trailer not available.</div>'}
                 <div class="modal-info" style="padding:30px; color: white;">
                     <h2 style="margin-top:0;">${movie.title}</h2>
                     <p style="line-height:1.6; opacity:0.8;">${movie.overview}</p>
@@ -79,7 +79,7 @@ window.addEventListener('DOMContentLoaded', () => {
         
         try {
             const aiRes = await fetch('/api/chat', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ message: val }) });
-            const aiData = await aiRes.res ? await aiRes.json() : { choices: [{ message: { content: val } }] }; 
+            const aiData = await aiRes.json();
             const recommendation = aiData.choices[0].message.content;
             
             currentPage = 1;
@@ -96,9 +96,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
     genreDropdown.onchange = async (e) => {
         if (!e.target.value) return;
-        currentPage = 1;
-        currentQuery = e.target.value;
-        currentMode = 'genre';
+        currentPage = 1; currentQuery = e.target.value; currentMode = 'genre';
         const data = await fetchMovies(currentQuery, 'genre');
         displayMovies(data);
         titleElement.innerText = e.target.options[e.target.selectedIndex].text;
@@ -110,6 +108,5 @@ window.addEventListener('DOMContentLoaded', () => {
         displayMovies(data, true);
     };
 
-    // Load trending on start
     fetchMovies('trending', 'search').then(displayMovies);
 });
