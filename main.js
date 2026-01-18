@@ -16,14 +16,8 @@ window.addEventListener('DOMContentLoaded', () => {
         let url = `/api/movies?query=${encodeURIComponent(query)}&page=${page}`;
         if (mode === 'genre') url = `/api/movies?genre=${query}&page=${page}`;
         if (mode === 'id') url = `/api/movies?id=${query}&append=videos,watch/providers`;
-
-        try {
-            const response = await fetch(url);
-            return await response.json();
-        } catch (err) {
-            console.error("Fetch failed", err);
-            return { results: [] };
-        }
+        const response = await fetch(url);
+        return await response.json();
     }
 
     async function showMovieDetails(movieId) {
@@ -35,13 +29,15 @@ window.addEventListener('DOMContentLoaded', () => {
         modal.className = 'movie-modal';
         modal.innerHTML = `
             <div class="modal-content">
-                <span class="close-button">&times;</span>
-                ${trailer ? `<iframe width="100%" height="450" src="https://www.youtube.com/embed/${trailer.key}?autoplay=1" frameborder="0" allowfullscreen></iframe>` : '<div style="padding:60px; text-align:center;">Trailer not available.</div>'}
-                <div class="modal-info" style="padding:30px; color: white;">
-                    <h2 style="margin-top:0;">${movie.title}</h2>
-                    <p style="line-height:1.6; opacity:0.8;">${movie.overview}</p>
+                <div class="modal-header">
+                    <button class="close-button">&times;</button>
+                </div>
+                ${trailer ? `<iframe width="100%" height="450" src="https://www.youtube.com/embed/${trailer.key}?autoplay=1" frameborder="0" allowfullscreen></iframe>` : '<div style="padding:60px; text-align:center;">Trailer not found.</div>'}
+                <div style="padding:25px; color: white;">
+                    <h2 style="margin:0 0 10px 0;">${movie.title}</h2>
+                    <p style="opacity:0.8; line-height:1.5;">${movie.overview}</p>
                     <div style="margin-top:20px;">
-                        <h3>Available on:</h3>
+                        <h3>Watch on:</h3>
                         <div class="provider-logos">${providers.map(p => `<img src="https://image.tmdb.org/t/p/original${p.logo_path}" title="${p.provider_name}">`).join('') || 'Check local listings'}</div>
                     </div>
                 </div>
@@ -63,7 +59,7 @@ window.addEventListener('DOMContentLoaded', () => {
                 <img src="${poster}" style="width:100%;">
                 <div style="padding:15px; text-align:center;">
                     <h3 style="font-size:0.95rem; margin-bottom:12px; height:40px; overflow:hidden;">${movie.title}</h3>
-                    <button class="view-btn" style="background:#e50914; color:white; border:none; padding:10px 15px; cursor:pointer; border-radius:5px; font-weight:bold; width:100%;">View Details</button>
+                    <button class="view-btn" style="background:#e50914; color:white; border:none; padding:10px; cursor:pointer; border-radius:5px; width:100%; font-weight:bold;">View Details</button>
                 </div>`;
             card.querySelector('.view-btn').onclick = () => showMovieDetails(movie.id);
             resultsContainer.appendChild(card);
@@ -75,23 +71,14 @@ window.addEventListener('DOMContentLoaded', () => {
     searchBtn.onclick = async () => {
         const val = movieInput.value;
         if (!val) return;
-        resultsContainer.innerHTML = "<p style='grid-column: 1/-1; text-align:center;'>Consulting the Movie Oracle...</p>";
-        
-        try {
-            const aiRes = await fetch('/api/chat', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ message: val }) });
-            const aiData = await aiRes.json();
-            const recommendation = aiData.choices[0].message.content;
-            
-            currentPage = 1;
-            currentQuery = recommendation;
-            currentMode = 'search';
-            
-            const movieData = await fetchMovies(recommendation, 'search');
-            displayMovies(movieData);
-            titleElement.innerText = "Suggested: " + recommendation;
-        } catch (e) {
-            resultsContainer.innerHTML = "<p style='grid-column:1/-1; text-align:center;'>Connection Error.</p>";
-        }
+        resultsContainer.innerHTML = "<p style='grid-column: 1/-1; text-align:center;'>Searching...</p>";
+        const aiRes = await fetch('/api/chat', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ message: val }) });
+        const aiData = await aiRes.json();
+        const recommendation = aiData.choices[0].message.content;
+        currentPage = 1; currentQuery = recommendation; currentMode = 'search';
+        const movieData = await fetchMovies(recommendation, 'search');
+        displayMovies(movieData);
+        titleElement.innerText = "Suggested: " + recommendation;
     };
 
     genreDropdown.onchange = async (e) => {
