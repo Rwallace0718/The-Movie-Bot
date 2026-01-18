@@ -1,45 +1,73 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Movie Bot</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-    <header>
-        <div class="top-bar">
-            <button id="theme-toggle">🌓 Toggle Theme</button>
-        </div>
-    </header>
+// Safety Check - If you see this alert, the file loaded!
+console.log("Movie Bot Script Loaded");
 
-    <main>
-        <div class="hero-section">
-            <img src="logo_header.svg" alt="Logo" class="main-logo">
-            <div class="search-container">
-                <div class="search-box">
-                    <input type="text" id="movie-input" placeholder="Search a mood...">
-                    <button id="search-button">Search AI</button>
-                </div>
-                <div class="filter-box">
-                    <select id="genre-dropdown">
-                        <option value="">-- Select Genre --</option>
-                        <option value="28">Action</option>
-                        <option value="35">Comedy</option>
-                        <option value="27">Horror</option>
-                        <option value="18">Drama</option>
-                        <option value="878">Sci-Fi</option>
-                    </select>
-                </div>
-            </div>
-        </div>
-        <h2 id="current-view-title" style="text-align:center;">Trending</h2>
-        <div id="results-container"></div>
-    </main>
+window.addEventListener('DOMContentLoaded', () => {
+    const resultsContainer = document.getElementById('results-container');
+    const movieInput = document.getElementById('movie-input');
+    const searchBtn = document.getElementById('search-button');
+    const genreDropdown = document.getElementById('genre-dropdown');
+    const themeToggle = document.getElementById('theme-toggle');
 
-    <script src="main.js"></script>
-</body>
-</html>
-    loadInitialContent();
+    // THEME TOGGLE (This should work regardless of API)
+    themeToggle.onclick = () => {
+        document.body.classList.toggle('light-mode');
+        console.log("Theme changed");
+    };
+
+    async function fetchMovies(query, isGenre = false) {
+        const url = isGenre ? `/api/movies?genre=${query}` : `/api/movies?query=${encodeURIComponent(query)}`;
+        try {
+            const response = await fetch(url);
+            const data = await response.json();
+            return data.results || [];
+        } catch (e) {
+            console.error("Fetch error", e);
+            return [];
+        }
+    }
+
+    function displayMovies(movies) {
+        resultsContainer.innerHTML = "";
+        if (!movies || movies.length === 0) {
+            resultsContainer.innerHTML = "<p>No movies found.</p>";
+            return;
+        }
+        movies.forEach(movie => {
+            const card = document.createElement('div');
+            card.className = 'movie-card';
+            const poster = movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : 'https://via.placeholder.com/500x750';
+            card.innerHTML = `
+                <img src="${poster}" style="width:100%; border-radius:10px;">
+                <div class="movie-info"><h3>${movie.title}</h3></div>
+            `;
+            resultsContainer.appendChild(card);
+        });
+    }
+
+    searchBtn.onclick = async () => {
+        const query = movieInput.value;
+        if (!query) return;
+        resultsContainer.innerHTML = "<p>Thinking...</p>";
+        try {
+            const aiResponse = await fetch('/api/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: query })
+            });
+            const aiData = await aiResponse.json();
+            const movies = await fetchMovies(aiData.choices[0].message.content);
+            displayMovies(movies);
+        } catch (err) {
+            resultsContainer.innerHTML = "<p>Error connecting to API.</p>";
+        }
+    };
+
+    genreDropdown.onchange = async (e) => {
+        if (!e.target.value) return;
+        const movies = await fetchMovies(e.target.value, true);
+        displayMovies(movies);
+    };
+
+    // Load trending on start
+    fetchMovies('trending').then(displayMovies);
 });
-
