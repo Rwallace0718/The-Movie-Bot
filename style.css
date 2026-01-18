@@ -3,15 +3,12 @@
 body {
     margin: 0; padding: 0;
     font-family: 'Inter', sans-serif;
-    background-color: #000;
-    color: white;
-    min-height: 100vh;
-    overflow-x: hidden;
+    background-color: #000; color: white;
+    min-height: 100vh; overflow-x: hidden;
     background-image: 
         radial-gradient(white, rgba(255,255,255,.2) 2px, transparent 40px),
-        radial-gradient(white, rgba(255,255,255,.15) 1px, transparent 30px),
-        radial-gradient(white, rgba(255,255,255,.1) 2px, transparent 40px);
-    background-size: 550px 550px, 350px 350px, 250px 250px;
+        radial-gradient(white, rgba(255,255,255,.15) 1px, transparent 30px);
+    background-size: 550px 550px, 350px 350px;
     animation: move-stars 60s linear infinite;
     transition: background 0.5s ease;
 }
@@ -21,18 +18,16 @@ body {
     to { background-position: 1000px 1000px; }
 }
 
-/* LIGHT MODE & 3D LOGO EFFECT */
+/* Light Mode & 3D Logo Effect */
 body.light-mode { background: #f0f4f8; color: #1a1a1a; background-image: none; }
 body.light-mode .main-logo { filter: drop-shadow(6px 6px 12px rgba(0, 0, 0, 0.4)); }
 body.light-mode #movie-input { color: #1a1a1a; }
 body.light-mode #genre-dropdown { background: #fff; color: #1a1a1a; }
 
-/* MOVIE GRID */
 #results-container {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 30px;
-    padding: 20px 4%;
+    gap: 30px; padding: 20px 4%;
 }
 
 .movie-card {
@@ -41,20 +36,27 @@ body.light-mode #genre-dropdown { background: #fff; color: #1a1a1a; }
 }
 .movie-card:hover { transform: translateY(-10px); border-color: #e50914; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
 
-/* MODAL FIX: FLOATING BUTTON */
+/* MODAL BOX - SAFETY GAP AT TOP */
 .movie-modal {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.95); display: flex; justify-content: center; align-items: center; z-index: 2000;
+    background: rgba(0,0,0,0.92); display: flex; justify-content: center; align-items: center; z-index: 2000;
 }
 
 .modal-content {
-    background: #111; width: 90%; max-width: 850px; border-radius: 15px; position: relative;
+    background: #111; width: 90%; max-width: 850px; border-radius: 15px; 
+    position: relative; 
+    padding-top: 50px; /* The gap for the X button */
+    box-shadow: 0 10px 40px rgba(0,0,0,0.8);
 }
 
 .close-button {
-    position: absolute; top: -25px; right: -25px; font-size: 26px; color: white; cursor: pointer; z-index: 2100;
-    background: #e50914; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center;
-    border-radius: 50%; box-shadow: 0 4px 15px rgba(0,0,0,0.5); transition: 0.2s;
+    position: absolute; 
+    top: 10px; /* Perfectly centered in the padding gap */
+    right: 15px; 
+    font-size: 24px; color: white; cursor: pointer; z-index: 2100;
+    background: #e50914; width: 35px; height: 35px; 
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%; transition: 0.2s;
 }
 
 .close-button:hover { transform: scale(1.1); background: #ff0000; }
