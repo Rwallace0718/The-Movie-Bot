@@ -3,12 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Movie Bot</title>
+    <title>The Movie Bot | AI Cinema Guide</title>
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
+
     <header style="display: flex; justify-content: flex-end; padding: 20px;">
-        <button id="theme-toggle" style="cursor:pointer; z-index: 100;">🌓 Toggle Theme</button>
+        <button id="theme-toggle" style="cursor:pointer; z-index: 100; padding: 10px 20px; border-radius: 20px; border: none; background: #333; color: white;">🌓 Toggle Theme</button>
     </header>
 
     <main>
@@ -16,13 +18,13 @@
             <img src="logo_header.svg" alt="The Movie Bot" style="max-width: 400px; width: 100%;">
             
             <div class="search-container" style="margin-top: 30px;">
-                <div class="search-box" style="display: inline-flex; border: 2px solid red; border-radius: 30px; padding: 5px; background: rgba(255,255,255,0.1);">
+                <div class="search-box" style="display: inline-flex; border: 2px solid #e50914; border-radius: 30px; padding: 5px; background: rgba(255,255,255,0.1);">
                     <input type="text" id="movie-input" placeholder="What's the vibe?" style="background: transparent; border: none; color: white; padding: 10px; width: 250px; outline: none;">
-                    <button id="search-button" style="background: red; color: white; border: none; border-radius: 20px; padding: 10px 20px; cursor: pointer;">Search AI</button>
+                    <button id="search-button" style="background: #e50914; color: white; border: none; border-radius: 20px; padding: 10px 20px; cursor: pointer; font-weight: bold;">Search AI</button>
                 </div>
 
                 <div class="filter-box" style="margin-top: 20px;">
-                    <select id="genre-dropdown" style="padding: 10px; border-radius: 10px; background: #222; color: white;">
+                    <select id="genre-dropdown" style="padding: 10px 20px; border-radius: 20px; background: #222; color: white; border: 1px solid #444; cursor: pointer;">
                         <option value="">-- Browse Genres --</option>
                         <option value="28">Action</option>
                         <option value="35">Comedy</option>
