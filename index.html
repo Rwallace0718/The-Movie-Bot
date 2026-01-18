@@ -4,40 +4,43 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The Movie Bot</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
     <header>
-        <div class="top-bar">
-            <button id="theme-toggle">🌓 Toggle Theme</button>
-        </div>
+        <button id="theme-toggle">🌓 Toggle Theme</button>
     </header>
 
     <main>
         <div class="hero-section">
-            <img src="logo_header.svg" alt="Logo" class="main-logo">
+            <img src="logo_header.svg" alt="The Movie Bot" class="main-logo">
+            
             <div class="search-container">
                 <div class="search-box">
-                    <input type="text" id="movie-input" placeholder="Search a mood...">
+                    <input type="text" id="movie-input" placeholder="What's the vibe?">
                     <button id="search-button">Search AI</button>
                 </div>
+
                 <div class="filter-box">
                     <select id="genre-dropdown">
-                        <option value="">-- Select Genre --</option>
+                        <option value="">-- Browse Genres --</option>
                         <option value="28">Action</option>
                         <option value="35">Comedy</option>
                         <option value="27">Horror</option>
                         <option value="18">Drama</option>
                         <option value="878">Sci-Fi</option>
+                        <option value="16">Animation</option>
                     </select>
                 </div>
             </div>
         </div>
-        <h2 id="current-view-title" style="text-align:center;">Trending</h2>
+
+        <h2 id="current-view-title">Trending Now</h2>
         <div id="results-container"></div>
     </main>
 
-    <script src="main.js"><script>
+    <script src="main.js"></script>
 </body>
 </html>
-
