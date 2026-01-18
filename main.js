@@ -10,37 +10,62 @@ window.addEventListener('DOMContentLoaded', () => {
         } catch (error) { return []; }
     }
 
+    // Function to show Trailer and Streaming info in a popup
+    async function showMovieDetails(movieId) {
+        const resultsContainer = document.getElementById('results-container');
+        // Fetch extra data: videos (trailers) and watch providers (streaming)
+        const response = await fetch(`${API_PATHS.movies}?id=${movieId}&append=videos,watch/providers`);
+        const movie = await response.json();
+
+        const trailer = movie.videos?.results.find(v => v.type === 'Trailer');
+        const providers = movie['watch/providers']?.results?.US?.flatrate || [];
+
+        // Create the Modal
+        const modal = document.createElement('div');
+        modal.className = 'movie-modal';
+        modal.innerHTML = `
+            <div class="modal-content">
+                <span class="close-button">&times;</span>
+                ${trailer ? `<iframe width="100%" height="315" src="https://www.youtube.com/embed/${trailer.key}" frameborder="0" allowfullscreen></iframe>` : '<p>No trailer available</p>'}
+                <div class="modal-info">
+                    <h2>${movie.title}</h2>
+                    <p>${movie.overview}</p>
+                    <div class="providers">
+                        <h3>Available on:</h3>
+                        <div class="provider-logos">
+                            ${providers.map(p => `<img src="https://image.tmdb.org/t/p/original${p.logo_path}" title="${p.provider_name}">`).join('') || 'Check local listings'}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+
+        modal.querySelector('.close-button').onclick = () => modal.remove();
+        window.onclick = (event) => { if (event.target == modal) modal.remove(); };
+    }
+
     function displayMovies(movies) {
         const container = document.getElementById('results-container');
         container.innerHTML = "";
-
-        if (movies.length === 0) {
-            container.innerHTML = "<p>No movies found. Try another search!</p>";
-            return;
-        }
-
         movies.forEach(movie => {
-            // Create a clickable link for each card
-            const card = document.createElement('a');
+            const card = document.createElement('div');
             card.className = 'movie-card';
-            card.href = `https://www.themoviedb.org/movie/${movie.id}`;
-            card.target = "_blank"; // Opens in new tab
-            
-            const poster = movie.poster_path 
-                ? `https://image.tmdb.org/t/p/w300${movie.poster_path}` 
-                : 'https://via.placeholder.com/300x450?text=No+Poster';
-
+            const poster = movie.poster_path ? `https://image.tmdb.org/t/p/w300${movie.poster_path}` : 'https://via.placeholder.com/300x450';
             card.innerHTML = `
                 <img src="${poster}" alt="${movie.title}">
                 <div class="movie-info">
                     <h3>${movie.title}</h3>
-                    <p>${movie.release_date ? movie.release_date.split('-')[0] : 'N/A'}</p>
+                    <button class="details-btn">View Trailer</button>
                 </div>
             `;
+            // Trigger the details popup on click
+            card.querySelector('.details-btn').onclick = () => showMovieDetails(movie.id);
             container.appendChild(card);
         });
     }
 
+    // Existing Listeners (Search and Genre)
     document.getElementById('search-button')?.addEventListener('click', async () => {
         const input = document.getElementById('movie-input').value;
         if (!input) return;
@@ -57,12 +82,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('genre-dropdown')?.addEventListener('change', async (e) => {
         if (!e.target.value) return;
-        document.getElementById('results-container').innerHTML = "<p>Loading Genre...</p>";
         const movies = await fetchMovies(e.target.value, true);
         displayMovies(movies);
-    });
-
-    document.getElementById('theme-toggle')?.addEventListener('click', () => {
-        document.body.classList.toggle('dark-mode');
     });
 });
