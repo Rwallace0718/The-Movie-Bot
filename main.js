@@ -29,32 +29,40 @@ window.addEventListener('DOMContentLoaded', () => {
 
     async function showMovieDetails(movieId) {
         const movie = await fetchMovies(movieId, 'id');
-        const trailer = movie.videos?.results.find(v => v.type === 'Trailer');
-        const providers = movie['watch/providers']?.results?.US?.flatrate || [];
+        const trailer = movie.videos?.results.find(v => v.type === 'Trailer' || v.type === 'Teaser');
 
         const modal = document.createElement('div');
         modal.className = 'movie-modal';
         modal.innerHTML = `
-            <div class="modal-content" style="position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); z-index:3000; background:#111; width:95%; max-width:700px; border-radius:15px; overflow:hidden;">
-                <div style="background:#000; padding:10px; display:flex; justify-content:flex-end;"><button class="close-btn" style="background:#e50914; color:white; border:none; border-radius:50%; width:30px; height:30px; cursor:pointer; font-weight:bold;">&times;</button></div>
-                <iframe width="100%" height="350" src="https://www.youtube.com/embed/${trailer?.key || ''}?autoplay=1" frameborder="0" allowfullscreen></iframe>
-                <div style="padding:20px; color:white;">
-                    <h2>${movie.title}</h2>
-                    <p style="font-size:0.9rem; opacity:0.8;">${movie.overview}</p>
+            <div class="modal-content">
+                <div class="modal-header"><button class="close-btn">&times;</button></div>
+                <div class="video-container">
+                    ${trailer ? `<iframe width="100%" height="400" src="https://www.youtube.com/embed/${trailer.key}?autoplay=1" frameborder="0" allowfullscreen></iframe>` : '<div style="padding:60px; text-align:center; color:white;">Trailer not found</div>'}
+                </div>
+                <div style="padding:25px; color:white;">
+                    <h2 style="margin-top:0;">${movie.title}</h2>
+                    <p style="opacity:0.8; line-height:1.5;">${movie.overview}</p>
                 </div>
             </div>`;
         document.body.appendChild(modal);
         modal.querySelector('.close-btn').onclick = () => modal.remove();
+        window.onclick = (e) => { if (e.target == modal) modal.remove(); };
     }
 
     function displayMovies(data, append = false) {
         const movies = data.results || [];
         if (!append) resultsContainer.innerHTML = "";
+        
         movies.forEach(movie => {
             const card = document.createElement('div');
             card.className = 'movie-card';
-            const poster = movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : 'https://via.placeholder.com/500x750';
-            card.innerHTML = `<img src="${poster}"><div style="padding:15px; text-align:center;"><h3>${movie.title}</h3><button class="view-btn">Details</button></div>`;
+            const poster = movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : 'https://via.placeholder.com/500x750?text=No+Poster';
+            card.innerHTML = `
+                <img src="${poster}">
+                <div style="padding:15px; text-align:center;">
+                    <h3 style="font-size:0.95rem; height:40px; overflow:hidden; margin-bottom:10px;">${movie.title}</h3>
+                    <button class="view-btn" style="background:#e50914; color:white; border:none; padding:10px; cursor:pointer; border-radius:5px; width:100%; font-weight:bold;">Details</button>
+                </div>`;
             card.querySelector('.view-btn').onclick = () => showMovieDetails(movie.id);
             resultsContainer.appendChild(card);
         });
@@ -64,11 +72,23 @@ window.addEventListener('DOMContentLoaded', () => {
     searchBtn.onclick = async () => {
         const val = movieInput.value.trim();
         if(!val) return;
+        
         toggleLoading(true);
-        currentMode = 'search'; currentQuery = val; currentPage = 1;
-        const data = await fetchMovies(val, 'search');
+        resultsContainer.innerHTML = "<p style='grid-column: 1/-1; text-align:center; padding:50px;'>Consulting the Oracle...</p>";
+        
+        let recommendation = val;
+        try {
+            const aiRes = await fetch('/api/chat', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({message:val}) });
+            if(aiRes.ok) { 
+                const aiData = await aiRes.json(); 
+                recommendation = aiData.choices[0].message.content; 
+            }
+        } catch(e) {}
+
+        currentMode = 'search'; currentQuery = recommendation; currentPage = 1;
+        const data = await fetchMovies(recommendation, 'search');
         displayMovies(data);
-        titleElement.innerText = "Results for: " + val;
+        titleElement.innerText = "Suggested: " + recommendation;
         toggleLoading(false);
     };
 
@@ -87,5 +107,6 @@ window.addEventListener('DOMContentLoaded', () => {
         displayMovies(data, true);
     };
 
+    // Load trending on start
     fetchMovies('', 'trending').then(displayMovies);
 });
