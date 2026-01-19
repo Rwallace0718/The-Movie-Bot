@@ -13,13 +13,14 @@ window.addEventListener('DOMContentLoaded', () => {
     document.getElementById('theme-toggle').onclick = () => document.body.classList.toggle('light-mode');
 
     async function fetchMovies(query, mode = 'search', page = 1) {
-        // If mode is trending and query is empty, Vercel needs a specific trigger
-        let searchQuery = query;
-        if (mode === 'trending' || !query) searchQuery = "trending";
-
-        let url = `/api/movies?query=${encodeURIComponent(searchQuery)}&page=${page}`;
-        if (mode === 'genre') url = `/api/movies?genre=${query}&page=${page}`;
-        if (mode === 'id') url = `/api/movies?id=${query}&append=videos`;
+        let url;
+        if (mode === 'trending') {
+            url = `/api/movies?query=trending&page=${page}`;
+        } else if (mode === 'genre') {
+            url = `/api/movies?genre=${query}&page=${page}`;
+        } else {
+            url = `/api/movies?query=${encodeURIComponent(query)}&page=${page}`;
+        }
 
         try {
             const res = await fetch(url);
@@ -36,14 +37,17 @@ window.addEventListener('DOMContentLoaded', () => {
             card.className = 'movie-card';
             const poster = movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : 'https://via.placeholder.com/500x750?text=No+Poster';
             
-            // INLINE STYLE: aspect-ratio and object-fit here are unblockable by the browser
             card.innerHTML = `
-                <img src="${poster}" style="width:100%; aspect-ratio:2/3; object-fit:cover; display:block;">
-                <div style="padding:10px; text-align:center;">
-                    <h3 style="font-size:0.8rem; height:32px; overflow:hidden; margin:0 0 10px 0;">${movie.title}</h3>
-                    <button class="view-btn" style="background:#e50914; color:#fff; border:none; padding:8px; width:100%; border-radius:5px; cursor:pointer; font-weight:bold;">Details</button>
+                <div class="poster-wrapper">
+                    <img src="${poster}" alt="${movie.title}">
+                </div>
+                <div class="card-content">
+                    <h3>${movie.title}</h3>
+                    <button class="view-btn">Details</button>
                 </div>`;
-            card.querySelector('.view-btn').onclick = () => showMovieDetails(movie.id);
+            
+            // Add click event for details (simplified for testing)
+            card.querySelector('.view-btn').onclick = () => alert(movie.overview);
             resultsContainer.appendChild(card);
         });
         loadMoreBtn.style.display = (data.total_pages > currentPage) ? "inline-block" : "none";
@@ -54,22 +58,23 @@ window.addEventListener('DOMContentLoaded', () => {
         if(!val) return;
         
         searchBtn.innerText = "...";
-        // AI CALL: This turns "MMA" into a detailed search string
-        let finalQuery = val;
+        let aiKeyword = val;
+
         try {
             const aiRes = await fetch('/api/chat', { 
                 method: 'POST', 
                 headers: {'Content-Type': 'application/json'}, 
-                body: JSON.stringify({ message: `Translate this movie vibe into 3 specific search keywords: ${val}` }) 
+                body: JSON.stringify({ message: `Provide 5 keywords for movies like: ${val}. Only return the keywords.` }) 
             });
             if (aiRes.ok) {
                 const aiData = await aiRes.json();
-                finalQuery = aiData.choices[0].message.content;
+                aiKeyword = aiData.choices[0].message.content;
+                console.log("AI Suggestion:", aiKeyword);
             }
-        } catch(e) { console.log("AI Offline, using keyword"); }
+        } catch(e) { console.error("AI failed"); }
 
-        currentMode = 'search'; currentQuery = finalQuery; currentPage = 1;
-        const data = await fetchMovies(finalQuery, 'search');
+        currentMode = 'search'; currentQuery = aiKeyword; currentPage = 1;
+        const data = await fetchMovies(aiKeyword, 'search');
         displayMovies(data);
         titleElement.innerText = "Results for: " + val;
         searchBtn.innerText = "Search AI";
@@ -84,12 +89,6 @@ window.addEventListener('DOMContentLoaded', () => {
         titleElement.innerText = e.target.options[e.target.selectedIndex].text;
     };
 
-    loadMoreBtn.onclick = async () => {
-        currentPage++;
-        const data = await fetchMovies(currentQuery, currentMode, currentPage);
-        displayMovies(data, true);
-    };
-
-    // Initial Load
+    // Load trending on startup
     fetchMovies('', 'trending').then(displayMovies);
 });
