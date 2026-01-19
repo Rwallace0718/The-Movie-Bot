@@ -2,13 +2,15 @@ window.addEventListener('DOMContentLoaded', () => {
     const resultsContainer = document.getElementById('results-container');
     const movieInput = document.getElementById('movie-input');
     const searchBtn = document.getElementById('search-button');
+    const genreDropdown = document.getElementById('genre-dropdown');
     const modal = document.getElementById('movie-modal');
 
     document.getElementById('theme-toggle').onclick = () => document.body.classList.toggle('light-mode');
 
     async function fetchMovies(query, mode = 'search') {
         let url = `/api/movies?query=${encodeURIComponent(query || 'trending')}`;
-        if (mode === 'id') url = `/api/movies?id=${query}&append=videos,watch/providers`;
+        if (mode === 'genre') url = `/api/movies?genre=${query}`;
+        if (mode === 'id') url = `/api/movies?id=${query}&append=videos`;
         
         try {
             const res = await fetch(url);
@@ -18,39 +20,28 @@ window.addEventListener('DOMContentLoaded', () => {
 
     async function openModal(movieId) {
         modal.style.display = 'flex';
-        document.getElementById('video-area').innerHTML = '<p style="color:white;text-align:center;padding-top:20%;">Loading Trailer...</p>';
+        document.getElementById('video-area').innerHTML = '<p style="color:white;text-align:center;padding:10% 0;">Loading...</p>';
         
         const movie = await fetchMovies(movieId, 'id');
         const trailer = movie.videos?.results.find(v => v.type === 'Trailer');
-        const providers = movie['watch/providers']?.results?.US?.flatrate || [];
 
-        // Fill Modal
         document.getElementById('m-title').innerText = movie.title;
         document.getElementById('m-desc').innerText = movie.overview;
         document.getElementById('video-area').innerHTML = trailer ? 
             `<iframe width="100%" height="100%" src="https://www.youtube.com/embed/${trailer.key}?autoplay=1" frameborder="0" allowfullscreen></iframe>` : 
-            '<div style="padding:50px;color:gray;text-align:center;">Trailer not available</div>';
-        
-        const streamDiv = document.getElementById('m-streaming');
-        streamDiv.innerHTML = providers.map(p => `<img src="https://image.tmdb.org/t/p/original${p.logo_path}" title="${p.provider_name}" style="width:35px;border-radius:5px;">`).join('');
+            '<div style="padding:40px;text-align:center;">No trailer available</div>';
     }
 
-    document.getElementById('modal-close').onclick = () => {
-        modal.style.display = 'none';
-        document.getElementById('video-area').innerHTML = ''; // Stop video
-    };
+    document.getElementById('modal-close').onclick = () => { modal.style.display = 'none'; document.getElementById('video-area').innerHTML = ''; };
 
     function displayMovies(data) {
         resultsContainer.innerHTML = "";
         (data.results || []).forEach(movie => {
             const card = document.createElement('div');
             card.className = 'movie-card';
-            const img = movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : 'https://via.placeholder.com/500x750?text=No+Poster';
+            const img = movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : 'https://via.placeholder.com/500x750';
             
-            card.innerHTML = `
-                <div class="poster-container"><img src="${img}"></div>
-                <div class="card-content"><h3>${movie.title}</h3></div>
-            `;
+            card.innerHTML = `<img src="${img}"><div class="card-content"><h3>${movie.title}</h3></div>`;
             card.onclick = () => openModal(movie.id);
             resultsContainer.appendChild(card);
         });
@@ -59,29 +50,36 @@ window.addEventListener('DOMContentLoaded', () => {
     searchBtn.onclick = async () => {
         const val = movieInput.value.trim();
         if(!val) return;
-        searchBtn.innerText = "...";
+        searchBtn.innerText = "Thinking...";
         
-        // Step 1: Ask AI for keywords
-        let keywords = val;
+        // BETTER AI PROMPT: This asks for 5 movie titles based on the vibe
+        let searchQuery = val;
         try {
             const ai = await fetch('/api/chat', { 
                 method: 'POST', 
                 headers: {'Content-Type': 'application/json'}, 
-                body: JSON.stringify({ message: `Reply with only 3 search terms for: ${val}` }) 
+                body: JSON.stringify({ message: `Based on the vibe "${val}", list 5 movies. Return only the movie titles separated by commas.` }) 
             });
             if(ai.ok) {
                 const aiData = await ai.json();
-                keywords = aiData.choices[0].message.content;
+                searchQuery = aiData.choices[0].message.content;
             }
         } catch(e) {}
 
-        // Step 2: Search Movies
-        const data = await fetchMovies(keywords);
+        const data = await fetchMovies(searchQuery);
         displayMovies(data);
         searchBtn.innerText = "Search AI";
-        document.getElementById('current-view-title').innerText = "Results for: " + val;
+        document.getElementById('current-view-title').innerText = "Vibe Results: " + val;
     };
 
-    // Initial Load
-    fetchMovies('trending').then(displayMovies);
+    genreDropdown.onchange = async (e) => {
+        const gid = e.target.value;
+        if(!gid) return;
+        const data = await fetchMovies(gid, 'genre');
+        displayMovies(data);
+        document.getElementById('current-view-title').innerText = e.target.options[e.target.selectedIndex].text;
+    };
+
+    // Initial Trending Load
+    fetchMovies('').then(displayMovies);
 });
