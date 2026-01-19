@@ -2,13 +2,14 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>The Movie Bot</title>
-    <link rel="stylesheet" href="style.css?v=5.0">
+    <link rel="stylesheet" href="style.css?v=6.0">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <header class="site-header">
-        <div class="header-content"><button id="theme-toggle">🌓 Theme</button></div>
+        <button id="theme-toggle">🌓 Theme</button>
     </header>
 
     <main>
@@ -16,11 +17,11 @@
             <img src="logo_header.svg" alt="The Movie Bot" class="main-logo">
             <div class="search-container">
                 <div class="search-box">
-                    <input type="text" id="movie-input" placeholder="MMA, 80s Horror, Space vibes...">
+                    <input type="text" id="movie-input" placeholder="MMA, space vibes, etc...">
                     <button id="search-button">Search AI</button>
                 </div>
                 <select id="genre-dropdown">
-                    <option value="">-- Browse Genres --</option>
+                    <option value="">-- Genres --</option>
                     <option value="28">Action</option>
                     <option value="35">Comedy</option>
                     <option value="27">Horror</option>
@@ -29,10 +30,12 @@
             </div>
         </div>
 
-        <h2 id="current-view-title" style="text-align:center; margin-top:30px;">Trending Now</h2>
+        <h2 id="current-view-title" style="text-align:center;">Trending Now</h2>
         <div id="results-container"></div>
-        <div style="text-align:center; padding:40px;"><button id="load-more-btn" style="display:none; border:2px solid #e50914; color:#e50914; background:none; padding:10px 20px; border-radius:20px; cursor:pointer;">More</button></div>
+        <div id="load-more-area" style="text-align:center; padding:40px;">
+            <button id="load-more-btn" style="display:none;">Load More</button>
+        </div>
     </main>
-    <script src="main.js?v=5.0"></script>
+    <script src="main.js?v=6.0"></script>
 </body>
 </html>
