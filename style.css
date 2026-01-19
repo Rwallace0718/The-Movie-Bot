@@ -13,52 +13,59 @@ body {
 
 @keyframes move-stars { from {background-position: 0 0;} to {background-position: 1000px 1000px;} }
 
-/* Header & Logo */
+/* Header */
 .site-header { width: 100%; padding: 15px; }
 .header-content { max-width: 1200px; margin: 0 auto; display: flex; justify-content: flex-end; }
-#theme-toggle { cursor:pointer; padding: 8px 15px; border-radius: 20px; border: none; background: #333; color: white; font-size: 13px; }
+#theme-toggle { cursor:pointer; padding: 8px 15px; border-radius: 20px; border: none; background: #333; color: white; font-size: 13px; font-weight: bold; }
 
+/* Hero & Search */
 .hero-section { text-align: center; padding: 10px; }
 .main-logo { max-width: 320px; width: 100%; margin-bottom: 20px; }
-
-/* Search Box Constraints */
 .search-container { max-width: 500px; margin: 0 auto; width: 90%; display: flex; flex-direction: column; gap: 15px; }
 .search-box { display: flex; border: 2px solid #e50914; border-radius: 30px; overflow: hidden; background: rgba(255,255,255,0.1); }
 #movie-input { background: transparent; border: none; color: white; padding: 12px; flex: 1; outline: none; }
 #search-button { background: #e50914; color: white; border: none; padding: 10px 20px; cursor: pointer; font-weight: bold; }
 
-/* The Grid - FIXED FOR MOBILE STRETCHING */
+/* The Grid */
 #results-container {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
     gap: 20px; padding: 20px 5%;
+    max-width: 1200px; margin: 0 auto;
+    align-items: start; /* Prevents cards from stretching to match neighbors */
 }
 
+/* The Card & Image Fix */
 .movie-card {
-    background: rgba(255,255,255,0.05); border-radius: 12px;
-    overflow: hidden; border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.05);
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.1);
+    display: flex;
+    flex-direction: column;
 }
 
 .movie-card img {
     width: 100%;
-    aspect-ratio: 2 / 3; /* THIS LOCKS THE SHAPE */
-    object-fit: cover;   /* THIS PREVENTS STRETCHING */
+    aspect-ratio: 2 / 3; /* Forces standard movie poster shape */
+    object-fit: cover;   /* Crops the image instead of stretching it */
     display: block;
+    flex-shrink: 0;      /* Prevents the image from being squished or pulled */
+}
+
+.card-info {
+    padding: 10px;
+    text-align: center;
+    flex-grow: 1;        /* Allows the text area to expand without pulling the image */
 }
 
 /* Light Mode */
 body.light-mode { background: #f0f4f8; color: #1a1a1a; background-image: none; }
-body.light-mode .main-logo { filter: drop-shadow(4px 4px 8px rgba(0,0,0,0.2)); }
-
-/* Modal */
-.movie-modal { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); display:flex; justify-content:center; align-items:center; z-index:2000; }
-.modal-content { background:#111; width:95%; max-width:700px; border-radius:15px; overflow:hidden; position:relative; }
-.modal-header { background:#000; padding:10px; display:flex; justify-content:flex-end; }
-.close-btn { background:#e50914; color:white; border:none; width:35px; height:35px; border-radius:50%; cursor:pointer; font-weight:bold; }
+body.light-mode .movie-card { background: #fff; border-color: #ccc; }
 
 /* Mobile Viewports */
 @media (max-width: 600px) {
-    .site-header { justify-content: center; }
-    #results-container { grid-template-columns: 1fr 1fr; gap: 10px; padding: 10px; }
-    .movie-card img { aspect-ratio: 2 / 3; }
+    .site-header { justify-content: center; padding: 10px; }
+    .header-content { justify-content: center; }
+    #results-container { grid-template-columns: 1fr 1fr; gap: 12px; padding: 10px; }
 }
