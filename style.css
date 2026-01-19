@@ -1,3 +1,4 @@
+/* RESET & BASE */
 * { box-sizing: border-box; }
 
 body {
@@ -9,58 +10,92 @@ body {
     background-size: 300px 300px;
     background-attachment: fixed;
     animation: move-stars 120s linear infinite;
+    transition: background 0.5s ease;
 }
 
 @keyframes move-stars { from { background-position: 0 0; } to { background-position: 1000px 1000px; } }
 
-/* Header Fix */
-.site-header { width: 100%; padding: 15px; position: relative; z-index: 100; }
+/* HEADER & THEME TOGGLE */
+.site-header { width: 100%; padding: 20px; z-index: 100; position: relative; }
 .header-content { max-width: 1200px; margin: 0 auto; display: flex; justify-content: flex-end; }
-#theme-toggle { cursor:pointer; padding: 8px 16px; border-radius: 20px; border: none; background: #333; color: white; font-weight: bold; }
+#theme-toggle { 
+    cursor:pointer; padding: 10px 18px; border-radius: 20px; 
+    border: none; background: #333; color: white; font-weight: bold; 
+}
 
-/* Large Screen Constraints */
+/* HERO & SEARCH CONSTRAINTS */
 .hero-section { text-align: center; padding: 10px 20px; }
-.main-logo { max-width: 350px; width: 100%; margin-bottom: 20px; }
+.main-logo { max-width: 350px; width: 100%; margin-bottom: 20px; transition: 0.3s; }
 
 .search-container { 
-    display: flex; flex-direction: column; align-items: center; gap: 15px;
-    max-width: 600px; margin: 0 auto; /* Keeps it from being too big on large screens */
+    display: flex; flex-direction: column; align-items: center; gap: 20px;
+    max-width: 550px; /* Prevents stretching on big screens */
+    margin: 30px auto; width: 95%; 
 }
 
 .search-box { 
-    display: flex; border: 2px solid #e50914; border-radius: 30px; 
-    padding: 5px; background: rgba(255,255,255,0.1); width: 100%; 
+    display: flex; border: 2px solid #e50914; border-radius: 35px; 
+    padding: 6px; background: rgba(255,255,255,0.1); width: 100%; overflow: hidden;
 }
-#movie-input { background: transparent; border: none; color: white; padding: 12px; flex: 1; outline: none; font-size: 1rem; }
-#search-button { background: #e50914; color: white; border: none; border-radius: 25px; padding: 10px 20px; cursor: pointer; font-weight: bold; }
+#movie-input { background: transparent; border: none; color: white; padding: 12px 18px; flex: 1; outline: none; font-size: 1rem; }
+#search-button { background: #e50914; color: white; border: none; border-radius: 25px; padding: 10px 25px; cursor: pointer; font-weight: bold; }
 
-.filter-box select { padding: 10px 20px; border-radius: 20px; background: #111; color: white; border: 1px solid #444; width: 200px; }
+.filter-box select { 
+    padding: 12px 25px; border-radius: 25px; background: #111; 
+    color: white; border: 1px solid #444; cursor: pointer; min-width: 220px;
+}
 
-/* Grid & Posters */
+/* MOVIE GRID */
 #results-container {
-    display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 25px; padding: 40px 5%; max-width: 1400px; margin: 0 auto;
+    display: grid; 
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 30px; padding: 40px 5%; 
+    max-width: 1400px; margin: 0 auto;
 }
 
-.movie-card { background: rgba(255,255,255,0.05); border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); transition: 0.3s; }
-.movie-card:hover { transform: translateY(-5px); border-color: #e50914; }
-.movie-card img { width: 100%; height: 300px; object-fit: cover; }
+.movie-card { 
+    background: rgba(255,255,255,0.05); border-radius: 12px; 
+    overflow: hidden; border: 1px solid rgba(255,255,255,0.1); transition: 0.3s; 
+}
+.movie-card:hover { transform: translateY(-8px); border-color: #e50914; }
+.movie-card img { width: 100%; height: 320px; object-fit: cover; display: block; }
 
-/* Light Mode */
+/* MODAL / TRAILERS */
+.movie-modal {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.96); display: flex; justify-content: center; align-items: center; z-index: 3000;
+}
+.modal-content { 
+    background: #111; width: 95%; max-width: 800px; border-radius: 15px; 
+    overflow: hidden; position: relative; 
+}
+.modal-header { background: #000; padding: 12px; display: flex; justify-content: flex-end; }
+.close-btn { 
+    background: #e50914; color: white; border: none; width: 35px; height: 35px; 
+    border-radius: 50%; cursor: pointer; font-weight: bold; font-size: 20px;
+}
+
+/* LIGHT MODE */
 body.light-mode { background: #f0f4f8; color: #1a1a1a; background-image: none; }
 body.light-mode #movie-input { color: #000; }
-body.light-mode .main-logo { filter: drop-shadow(4px 4px 10px rgba(0,0,0,0.3)); }
+body.light-mode .main-logo { filter: drop-shadow(5px 5px 12px rgba(0,0,0,0.4)); }
+body.light-mode .movie-card { background: white; border-color: #ddd; }
 
-/* Spinner */
-.spinner { display: inline-block; width: 12px; height: 12px; border: 2px solid rgba(255,255,255,.3); border-radius: 50%; border-top-color: #fff; animation: spin 1s linear infinite; margin-right: 8px; }
+/* SPINNER */
+.spinner { 
+    display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,.3); 
+    border-radius: 50%; border-top-color: #fff; animation: spin 0.8s linear infinite; margin-right: 8px; 
+}
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* MOBILE FIXES */
+/* MOBILE RESPONSIVENESS */
 @media (max-width: 600px) {
-    .site-header { padding: 10px; display: flex; justify-content: center; }
-    .header-content { justify-content: center; }
-    .main-logo { max-width: 240px; }
-    #results-container { grid-template-columns: 1fr 1fr; gap: 10px; padding: 10px; }
-    .movie-card img { height: 220px; }
-    .search-box { width: 95%; }
+    .site-header { padding: 15px 0; justify-content: center; display: flex; }
+    .header-content { justify-content: center; width: 100%; }
+    .hero-section { margin-top: 20px; }
+    .main-logo { max-width: 250px; }
+    #results-container { grid-template-columns: 1fr 1fr; gap: 12px; padding: 10px; }
+    .movie-card img { height: 230px; }
+    .search-box { width: 100%; }
+    #movie-input { font-size: 0.9rem; }
 }
