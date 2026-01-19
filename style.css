@@ -59,3 +59,18 @@ body.light-mode .main-logo { filter: drop-shadow(4px 4px 10px rgba(0,0,0,0.3)); 
     .main-logo { max-width: 250px; }
     iframe { height: 200px; }
 }
+/* Loading Spinner Animation */
+.spinner {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border: 2px solid rgba(255,255,255,.3);
+    border-radius: 50%;
+    border-top-color: #fff;
+    animation: spin 1s ease-in-out infinite;
+    margin-right: 8px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
