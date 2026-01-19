@@ -6,50 +6,55 @@ body {
 }
 
 .site-header { padding: 15px; display: flex; justify-content: flex-end; }
-#theme-toggle { cursor: pointer; border-radius: 20px; border: none; padding: 8px 15px; background: #333; color: #fff; }
+#theme-toggle { cursor: pointer; border-radius: 20px; border: none; padding: 8px 15px; background: #333; color: #fff; font-weight: bold; }
 
 .hero-section { text-align: center; padding: 10px; }
 .main-logo { max-width: 300px; width: 80%; margin-bottom: 20px; }
 .search-container { max-width: 500px; margin: 0 auto; width: 90%; display: flex; flex-direction: column; gap: 10px; }
 .search-box { display: flex; border: 2px solid #e50914; border-radius: 30px; overflow: hidden; background: rgba(0,0,0,0.5); }
-#movie-input { background: none; border: none; color: #fff; padding: 12px; flex: 1; outline: none; }
+#movie-input { background: none; border: none; color: #fff; padding: 12px; flex: 1; outline: none; font-size: 16px; }
 #search-button { background: #e50914; color: #fff; border: none; padding: 10px 20px; cursor: pointer; font-weight: bold; }
-#genre-dropdown { background: #111; color: white; border: 1px solid #333; padding: 10px; border-radius: 20px; }
 
 #results-container {
     display: grid; 
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     gap: 15px; padding: 15px; max-width: 1200px; margin: 0 auto;
 }
 
-/* THE FIX: Fixed height containers */
+/* THE POSTER FIX: Locking the height to a 2:3 ratio */
 .movie-card { 
-    background: #111; border-radius: 10px; overflow: hidden; 
-    display: flex; flex-direction: column; border: 1px solid #222;
-    height: 100%; /* Ensures cards in a row match height */
+    background: #111; border-radius: 8px; overflow: hidden; 
+    display: flex; flex-direction: column; cursor: pointer;
+    transition: transform 0.2s;
 }
+.movie-card:hover { transform: scale(1.03); }
 
-.poster-wrapper {
+.poster-container {
     width: 100%;
-    height: 250px; /* FIXED HEIGHT FOR MOBILE */
-    overflow: hidden;
+    aspect-ratio: 2 / 3; /* Forces standard poster shape */
+    background: #222;
 }
 
 .movie-card img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover; /* Crops rather than stretches */
+    width: 100%; height: 100%; object-fit: cover;
 }
 
-.card-content { padding: 10px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; }
-.card-content h3 { font-size: 0.85rem; margin: 0 0 10px 0; height: 2.4em; overflow: hidden; }
-.view-btn { background: #e50914; color: #fff; border: none; padding: 8px; border-radius: 5px; cursor: pointer; width: 100%; font-weight: bold; }
+.card-content { padding: 8px; text-align: center; }
+.card-content h3 { font-size: 0.8rem; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-/* Desktop Height */
-@media (min-width: 800px) {
-    .poster-wrapper { height: 350px; }
-    #results-container { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 25px; }
+/* MODAL / POPUP STYLES */
+.modal {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.95); z-index: 1000; display: none;
+    justify-content: center; align-items: center; padding: 20px;
 }
+.modal-content {
+    background: #111; width: 100%; max-width: 600px; border-radius: 15px;
+    overflow: hidden; border: 1px solid #333;
+}
+.video-box { background: #000; aspect-ratio: 16 / 9; width: 100%; }
+.details-box { padding: 20px; }
+.close-btn { background: #e50914; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; float: right; font-weight: bold; }
 
 @media (max-width: 600px) {
     #results-container { grid-template-columns: 1fr 1fr; }
