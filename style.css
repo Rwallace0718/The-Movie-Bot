@@ -1,30 +1,56 @@
 * { box-sizing: border-box; }
 body { 
-    margin: 0; background: #000; color: #fff; font-family: sans-serif; 
+    margin: 0; background: #000; color: #fff; font-family: 'Inter', sans-serif; 
     background-image: radial-gradient(white, rgba(255,255,255,.1) 1px, transparent 30px);
     background-size: 300px 300px; background-attachment: fixed;
 }
+
 .site-header { padding: 15px; display: flex; justify-content: flex-end; }
 #theme-toggle { cursor: pointer; border-radius: 20px; border: none; padding: 8px 15px; background: #333; color: #fff; }
 
-.hero-section { text-align: center; padding: 20px; }
-.main-logo { max-width: 300px; width: 80%; }
-.search-container { max-width: 500px; margin: 0 auto; display: flex; flex-direction: column; gap: 15px; }
-.search-box { display: flex; border: 2px solid #e50914; border-radius: 30px; overflow: hidden; }
+.hero-section { text-align: center; padding: 10px; }
+.main-logo { max-width: 300px; width: 80%; margin-bottom: 20px; }
+.search-container { max-width: 500px; margin: 0 auto; width: 90%; display: flex; flex-direction: column; gap: 10px; }
+.search-box { display: flex; border: 2px solid #e50914; border-radius: 30px; overflow: hidden; background: rgba(0,0,0,0.5); }
 #movie-input { background: none; border: none; color: #fff; padding: 12px; flex: 1; outline: none; }
 #search-button { background: #e50914; color: #fff; border: none; padding: 10px 20px; cursor: pointer; font-weight: bold; }
+#genre-dropdown { background: #111; color: white; border: 1px solid #333; padding: 10px; border-radius: 20px; }
 
 #results-container {
-    display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-    gap: 20px; padding: 20px; max-width: 1200px; margin: 0 auto;
+    display: grid; 
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 15px; padding: 15px; max-width: 1200px; margin: 0 auto;
 }
 
-.movie-card { background: #111; border-radius: 10px; overflow: hidden; border: 1px solid #333; }
+/* THE FIX: Fixed height containers */
+.movie-card { 
+    background: #111; border-radius: 10px; overflow: hidden; 
+    display: flex; flex-direction: column; border: 1px solid #222;
+    height: 100%; /* Ensures cards in a row match height */
+}
 
-/* Light Mode */
-body.light-mode { background: #f4f4f4; color: #000; background-image: none; }
-body.light-mode .movie-card { background: #fff; border-color: #ddd; }
+.poster-wrapper {
+    width: 100%;
+    height: 250px; /* FIXED HEIGHT FOR MOBILE */
+    overflow: hidden;
+}
+
+.movie-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Crops rather than stretches */
+}
+
+.card-content { padding: 10px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; }
+.card-content h3 { font-size: 0.85rem; margin: 0 0 10px 0; height: 2.4em; overflow: hidden; }
+.view-btn { background: #e50914; color: #fff; border: none; padding: 8px; border-radius: 5px; cursor: pointer; width: 100%; font-weight: bold; }
+
+/* Desktop Height */
+@media (min-width: 800px) {
+    .poster-wrapper { height: 350px; }
+    #results-container { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 25px; }
+}
 
 @media (max-width: 600px) {
-    #results-container { grid-template-columns: 1fr 1fr; gap: 10px; }
+    #results-container { grid-template-columns: 1fr 1fr; }
 }
