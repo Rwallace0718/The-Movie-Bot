@@ -7,26 +7,20 @@ window.addEventListener('DOMContentLoaded', () => {
     const titleElement = document.getElementById('current-view-title');
 
     let currentPage = 1;
-    let currentQuery = '';
+    let currentQuery = 'trending';
     let currentMode = 'trending';
 
     document.getElementById('theme-toggle').onclick = () => document.body.classList.toggle('light-mode');
 
     async function fetchMovies(query, mode = 'search', page = 1) {
-        let url;
-        if (mode === 'trending') {
-            url = `/api/movies?query=trending&page=${page}`; // Assumes your backend handles 'trending' keyword
-        } else if (mode === 'genre') {
-            url = `/api/movies?genre=${query}&page=${page}`;
-        } else if (mode === 'id') {
-            url = `/api/movies?id=${query}&append=videos`;
-        } else {
-            url = `/api/movies?query=${encodeURIComponent(query)}&page=${page}`;
-        }
-
+        let url = `/api/movies?query=${encodeURIComponent(query)}&page=${page}`;
+        if (mode === 'genre') url = `/api/movies?genre=${query}&page=${page}`;
+        if (mode === 'id') url = `/api/movies?id=${query}&append=videos`;
+        
         try {
             const res = await fetch(url);
-            return await res.json();
+            const data = await res.json();
+            return data;
         } catch(e) { return { results: [] }; }
     }
 
@@ -34,29 +28,37 @@ window.addEventListener('DOMContentLoaded', () => {
         const movie = await fetchMovies(movieId, 'id');
         const trailer = movie.videos?.results.find(v => v.type === 'Trailer');
         const modal = document.createElement('div');
-        modal.className = 'movie-modal';
+        modal.style = "position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);display:flex;justify-content:center;align-items:center;z-index:2000;padding:10px;";
         modal.innerHTML = `
-            <div class="modal-content">
-                <div class="modal-header"><button class="close-btn">&times;</button></div>
-                ${trailer ? `<iframe width="100%" height="350" src="https://www.youtube.com/embed/${trailer.key}?autoplay=1" frameborder="0" allowfullscreen></iframe>` : '<div style="padding:40px; text-align:center; color:white;">Trailer not available</div>'}
-                <div style="padding:20px; color:white;">
-                    <h2>${movie.title}</h2>
-                    <p style="font-size:0.9rem; opacity:0.8;">${movie.overview}</p>
+            <div style="background:#111;width:100%;max-width:600px;border-radius:15px;overflow:hidden;position:relative;">
+                <button id="close-m" style="position:absolute;top:10px;right:10px;background:#e50914;color:white;border:none;border-radius:50%;width:30px;height:30px;cursor:pointer;z-index:10;">&times;</button>
+                ${trailer ? `<iframe width="100%" height="300" src="https://www.youtube.com/embed/${trailer.key}?autoplay=1" frameborder="0" allowfullscreen></iframe>` : '<div style="padding:40px;text-align:center;color:white;">No trailer available</div>'}
+                <div style="padding:20px;color:white;">
+                    <h2 style="margin:0;">${movie.title}</h2>
+                    <p style="font-size:0.9rem;opacity:0.8;">${movie.overview}</p>
                 </div>
             </div>`;
         document.body.appendChild(modal);
-        modal.querySelector('.close-btn').onclick = () => modal.remove();
-        window.onclick = (e) => { if (e.target == modal) modal.remove(); };
+        document.getElementById('close-m').onclick = () => modal.remove();
+        modal.onclick = (e) => { if(e.target === modal) modal.remove(); };
     }
 
     function displayMovies(data, append = false) {
         const movies = data.results || [];
         if (!append) resultsContainer.innerHTML = "";
+        
         movies.forEach(movie => {
             const card = document.createElement('div');
             card.className = 'movie-card';
-            const poster = movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : 'https://via.placeholder.com/500x750';
-            card.innerHTML = `<img src="${poster}"><div style="padding:10px; text-align:center;"><h3 style="font-size:0.8rem; height:35px; overflow:hidden;">${movie.title}</h3><button class="view-btn" style="background:#e50914; color:white; border:none; padding:8px; width:100%; border-radius:5px; cursor:pointer;">Details</button></div>`;
+            const poster = movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : 'https://via.placeholder.com/500x750?text=No+Poster';
+            
+            // card-info wrapper ensures the button and title don't stretch the image
+            card.innerHTML = `
+                <img src="${poster}" alt="${movie.title}">
+                <div class="card-info">
+                    <h3 style="font-size:0.8rem; height:35px; overflow:hidden; margin:0 0 10px 0;">${movie.title}</h3>
+                    <button class="view-btn" style="background:#e50914; color:white; border:none; padding:8px; width:100%; border-radius:5px; cursor:pointer; font-size:0.75rem; font-weight:bold;">Details</button>
+                </div>`;
             card.querySelector('.view-btn').onclick = () => showMovieDetails(movie.id);
             resultsContainer.appendChild(card);
         });
@@ -87,6 +89,6 @@ window.addEventListener('DOMContentLoaded', () => {
         displayMovies(data, true);
     };
 
-    // THIS LOADS THE INITIAL TRENDING LIST
-    fetchMovies('', 'trending').then(displayMovies);
+    // Initial Trending Load
+    fetchMovies('trending', 'search').then(displayMovies);
 });
