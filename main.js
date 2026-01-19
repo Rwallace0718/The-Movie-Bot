@@ -7,40 +7,24 @@ window.addEventListener('DOMContentLoaded', () => {
     const titleElement = document.getElementById('current-view-title');
 
     let currentPage = 1;
-    let currentQuery = 'trending';
+    let currentQuery = '';
     let currentMode = 'trending';
 
     document.getElementById('theme-toggle').onclick = () => document.body.classList.toggle('light-mode');
 
     async function fetchMovies(query, mode = 'search', page = 1) {
-        let url = `/api/movies?query=${encodeURIComponent(query)}&page=${page}`;
+        // If mode is trending and query is empty, Vercel needs a specific trigger
+        let searchQuery = query;
+        if (mode === 'trending' || !query) searchQuery = "trending";
+
+        let url = `/api/movies?query=${encodeURIComponent(searchQuery)}&page=${page}`;
         if (mode === 'genre') url = `/api/movies?genre=${query}&page=${page}`;
         if (mode === 'id') url = `/api/movies?id=${query}&append=videos`;
-        
+
         try {
             const res = await fetch(url);
-            const data = await res.json();
-            return data;
+            return await res.json();
         } catch(e) { return { results: [] }; }
-    }
-
-    async function showMovieDetails(movieId) {
-        const movie = await fetchMovies(movieId, 'id');
-        const trailer = movie.videos?.results.find(v => v.type === 'Trailer');
-        const modal = document.createElement('div');
-        modal.style = "position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);display:flex;justify-content:center;align-items:center;z-index:2000;padding:10px;";
-        modal.innerHTML = `
-            <div style="background:#111;width:100%;max-width:600px;border-radius:15px;overflow:hidden;position:relative;">
-                <button id="close-m" style="position:absolute;top:10px;right:10px;background:#e50914;color:white;border:none;border-radius:50%;width:30px;height:30px;cursor:pointer;z-index:10;">&times;</button>
-                ${trailer ? `<iframe width="100%" height="300" src="https://www.youtube.com/embed/${trailer.key}?autoplay=1" frameborder="0" allowfullscreen></iframe>` : '<div style="padding:40px;text-align:center;color:white;">No trailer available</div>'}
-                <div style="padding:20px;color:white;">
-                    <h2 style="margin:0;">${movie.title}</h2>
-                    <p style="font-size:0.9rem;opacity:0.8;">${movie.overview}</p>
-                </div>
-            </div>`;
-        document.body.appendChild(modal);
-        document.getElementById('close-m').onclick = () => modal.remove();
-        modal.onclick = (e) => { if(e.target === modal) modal.remove(); };
     }
 
     function displayMovies(data, append = false) {
@@ -52,12 +36,12 @@ window.addEventListener('DOMContentLoaded', () => {
             card.className = 'movie-card';
             const poster = movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : 'https://via.placeholder.com/500x750?text=No+Poster';
             
-            // card-info wrapper ensures the button and title don't stretch the image
+            // INLINE STYLE: aspect-ratio and object-fit here are unblockable by the browser
             card.innerHTML = `
-                <img src="${poster}" alt="${movie.title}">
-                <div class="card-info">
-                    <h3 style="font-size:0.8rem; height:35px; overflow:hidden; margin:0 0 10px 0;">${movie.title}</h3>
-                    <button class="view-btn" style="background:#e50914; color:white; border:none; padding:8px; width:100%; border-radius:5px; cursor:pointer; font-size:0.75rem; font-weight:bold;">Details</button>
+                <img src="${poster}" style="width:100%; aspect-ratio:2/3; object-fit:cover; display:block;">
+                <div style="padding:10px; text-align:center;">
+                    <h3 style="font-size:0.8rem; height:32px; overflow:hidden; margin:0 0 10px 0;">${movie.title}</h3>
+                    <button class="view-btn" style="background:#e50914; color:#fff; border:none; padding:8px; width:100%; border-radius:5px; cursor:pointer; font-weight:bold;">Details</button>
                 </div>`;
             card.querySelector('.view-btn').onclick = () => showMovieDetails(movie.id);
             resultsContainer.appendChild(card);
@@ -68,17 +52,34 @@ window.addEventListener('DOMContentLoaded', () => {
     searchBtn.onclick = async () => {
         const val = movieInput.value.trim();
         if(!val) return;
-        currentMode = 'search'; currentQuery = val; currentPage = 1;
-        const data = await fetchMovies(val, 'search');
+        
+        searchBtn.innerText = "...";
+        // AI CALL: This turns "MMA" into a detailed search string
+        let finalQuery = val;
+        try {
+            const aiRes = await fetch('/api/chat', { 
+                method: 'POST', 
+                headers: {'Content-Type': 'application/json'}, 
+                body: JSON.stringify({ message: `Translate this movie vibe into 3 specific search keywords: ${val}` }) 
+            });
+            if (aiRes.ok) {
+                const aiData = await aiRes.json();
+                finalQuery = aiData.choices[0].message.content;
+            }
+        } catch(e) { console.log("AI Offline, using keyword"); }
+
+        currentMode = 'search'; currentQuery = finalQuery; currentPage = 1;
+        const data = await fetchMovies(finalQuery, 'search');
         displayMovies(data);
         titleElement.innerText = "Results for: " + val;
+        searchBtn.innerText = "Search AI";
     };
 
     genreDropdown.onchange = async (e) => {
-        const genreId = e.target.value;
-        if(!genreId) return;
-        currentMode = 'genre'; currentQuery = genreId; currentPage = 1;
-        const data = await fetchMovies(genreId, 'genre');
+        const gid = e.target.value;
+        if(!gid) return;
+        currentMode = 'genre'; currentQuery = gid; currentPage = 1;
+        const data = await fetchMovies(gid, 'genre');
         displayMovies(data);
         titleElement.innerText = e.target.options[e.target.selectedIndex].text;
     };
@@ -89,6 +90,6 @@ window.addEventListener('DOMContentLoaded', () => {
         displayMovies(data, true);
     };
 
-    // Initial Trending Load
-    fetchMovies('trending', 'search').then(displayMovies);
+    // Initial Load
+    fetchMovies('', 'trending').then(displayMovies);
 });
