@@ -2,10 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The Movie Bot</title>
-    <link rel="stylesheet" href="style.css?v=6.0">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css?v=10.0">
 </head>
 <body>
     <header class="site-header">
@@ -17,25 +16,28 @@
             <img src="logo_header.svg" alt="The Movie Bot" class="main-logo">
             <div class="search-container">
                 <div class="search-box">
-                    <input type="text" id="movie-input" placeholder="MMA, space vibes, etc...">
+                    <input type="text" id="movie-input" placeholder="MMA vibes, Space horror...">
                     <button id="search-button">Search AI</button>
                 </div>
-                <select id="genre-dropdown">
-                    <option value="">-- Genres --</option>
-                    <option value="28">Action</option>
-                    <option value="35">Comedy</option>
-                    <option value="27">Horror</option>
-                    <option value="878">Sci-Fi</option>
-                </select>
             </div>
         </div>
 
-        <h2 id="current-view-title" style="text-align:center;">Trending Now</h2>
+        <h2 id="current-view-title" style="text-align:center; margin-top:20px;">Trending</h2>
         <div id="results-container"></div>
-        <div id="load-more-area" style="text-align:center; padding:40px;">
-            <button id="load-more-btn" style="display:none;">Load More</button>
-        </div>
     </main>
-    <script src="main.js?v=6.0"></script>
+
+    <div id="movie-modal" class="modal">
+        <div class="modal-content">
+            <div id="video-area" class="video-box"></div>
+            <div class="details-box">
+                <button class="close-btn" id="modal-close">Close</button>
+                <h2 id="m-title"></h2>
+                <p id="m-desc" style="font-size: 0.9rem; line-height: 1.4; color: #ccc;"></p>
+                <div id="m-streaming" style="margin-top: 15px; display: flex; gap: 10px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="main.js?v=10.0"></script>
 </body>
 </html>
