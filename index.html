@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The Movie Bot | AI Cinema Guide</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=2.0">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -21,31 +21,37 @@
             
             <div class="search-container">
                 <div class="search-box">
-                    <input type="text" id="movie-input" placeholder="What's the vibe?">
+                    <input type="text" id="movie-input" placeholder="What's the vibe? (e.g. MMA, Sci-Fi)">
                     <button id="search-button">Search AI</button>
                 </div>
 
                 <div class="filter-box">
                     <select id="genre-dropdown">
-                        <option value="">-- Browse Genres --</option>
+                        <option value="">-- Browse All Genres --</option>
                         <option value="28">Action</option>
                         <option value="12">Adventure</option>
                         <option value="16">Animation</option>
                         <option value="35">Comedy</option>
                         <option value="80">Crime</option>
+                        <option value="99">Documentary</option>
                         <option value="18">Drama</option>
+                        <option value="10751">Family</option>
                         <option value="14">Fantasy</option>
+                        <option value="36">History</option>
                         <option value="27">Horror</option>
+                        <option value="10402">Music</option>
                         <option value="9648">Mystery</option>
                         <option value="10749">Romance</option>
                         <option value="878">Sci-Fi</option>
                         <option value="53">Thriller</option>
+                        <option value="10752">War</option>
+                        <option value="37">Western</option>
                     </select>
                 </div>
             </div>
         </div>
 
-        <h2 id="current-view-title">Trending Now</h2>
+        <h2 id="current-view-title">Trending for You</h2>
         
         <div id="results-container"></div>
 
@@ -54,6 +60,6 @@
         </div>
     </main>
 
-    <script src="main.js"></script>
+    <script src="main.js?v=2.0"></script>
 </body>
 </html>
