@@ -3,16 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Movie Bot | AI Cinema Guide</title>
-    <link rel="stylesheet" href="style.css?v=4.0">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <title>The Movie Bot</title>
+    <link rel="stylesheet" href="style.css?v=5.0">
 </head>
 <body>
-
     <header class="site-header">
-        <div class="header-content">
-            <button id="theme-toggle">🌓 Toggle Theme</button>
-        </div>
+        <div class="header-content"><button id="theme-toggle">🌓 Theme</button></div>
     </header>
 
     <main>
@@ -20,36 +16,23 @@
             <img src="logo_header.svg" alt="The Movie Bot" class="main-logo">
             <div class="search-container">
                 <div class="search-box">
-                    <input type="text" id="movie-input" placeholder="What are you in the mood for?">
+                    <input type="text" id="movie-input" placeholder="MMA, 80s Horror, Space vibes...">
                     <button id="search-button">Search AI</button>
                 </div>
-                <div class="filter-box">
-                    <select id="genre-dropdown">
-                        <option value="">-- Browse Genres --</option>
-                        <option value="28">Action</option>
-                        <option value="12">Adventure</option>
-                        <option value="16">Animation</option>
-                        <option value="35">Comedy</option>
-                        <option value="80">Crime</option>
-                        <option value="18">Drama</option>
-                        <option value="14">Fantasy</option>
-                        <option value="27">Horror</option>
-                        <option value="878">Sci-Fi</option>
-                        <option value="53">Thriller</option>
-                    </select>
-                </div>
+                <select id="genre-dropdown">
+                    <option value="">-- Browse Genres --</option>
+                    <option value="28">Action</option>
+                    <option value="35">Comedy</option>
+                    <option value="27">Horror</option>
+                    <option value="878">Sci-Fi</option>
+                </select>
             </div>
         </div>
 
-        <h2 id="current-view-title" style="text-align: center; margin-top: 30px;">Trending Now</h2>
-        
+        <h2 id="current-view-title" style="text-align:center; margin-top:30px;">Trending Now</h2>
         <div id="results-container"></div>
-
-        <div class="more-container" style="text-align: center; padding: 40px 0;">
-            <button id="load-more-btn" style="display: none; background: transparent; color: #e50914; border: 2px solid #e50914; padding: 12px 30px; border-radius: 25px; cursor: pointer; font-weight: bold;">Show More Results</button>
-        </div>
+        <div style="text-align:center; padding:40px;"><button id="load-more-btn" style="display:none; border:2px solid #e50914; color:#e50914; background:none; padding:10px 20px; border-radius:20px; cursor:pointer;">More</button></div>
     </main>
-
-    <script src="main.js?v=4.0"></script>
+    <script src="main.js?v=5.0"></script>
 </body>
 </html>
