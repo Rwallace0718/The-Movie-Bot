@@ -3,33 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Movie Bot</title>
-    <link rel="stylesheet" href="style.css?v=70.0">
+    <title>Movie Bot V3</title>
+    <link rel="stylesheet" href="style.css?v=90.0">
 </head>
-<body>
-    <header class="site-header">
-        <button id="theme-toggle">🌓 Theme</button>
+<body id="forced-v3-layout">
+    <header class="global-header">
+        <button id="theme-toggle">🌓 Change Theme</button>
     </header>
-    <div class="hero-section">
-        <img src="logo_header.svg" alt="The Movie Bot" class="main-logo">
-        <div class="search-container">
-            <div class="search-box">
-                <input type="text" id="movie-input" placeholder="MMA, 80s Horror, Space vibes...">
+
+    <div class="app-container">
+        <div class="hero">
+            <img src="logo_header.svg" class="main-logo" alt="Logo">
+            <div class="search-flex">
+                <input type="text" id="movie-input" placeholder="Type a vibe (e.g. Neon MMA)">
                 <button id="search-button">Search AI</button>
             </div>
         </div>
+
+        <div id="results-container"></div>
     </div>
-    <div id="results-container"></div>
+
     <div id="movie-modal" class="modal">
         <div class="modal-content">
-            <div id="video-area" class="video-box"></div>
-            <div class="details-box">
-                <button class="close-btn" id="modal-close">Close</button>
-                <h2 id="m-title" style="margin-top:0;"></h2>
-                <p id="m-desc" style="font-size:0.9rem;line-height:1.4;color:#ccc;"></p>
+            <button id="modal-close">Close</button>
+            <div id="video-area"></div>
+            <div class="details">
+                <h2 id="m-title"></h2>
+                <p id="m-desc"></p>
+                <div id="streaming-logos"></div>
             </div>
         </div>
     </div>
-    <script src="main.js?v=70.0"></script>
+
+    <script src="main.js?v=90.0"></script>
 </body>
 </html>
