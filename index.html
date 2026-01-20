@@ -3,39 +3,101 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VERSION 1000</title>
-    <link rel="stylesheet" href="style.css?v=110">
+    <title>The Movie Bot</title>
+    <style>
+        @keyframes moveStars { from { background-position: 0 0; } to { background-position: 1000px 1000px; } }
+        body { 
+            margin: 0; background: #000; color: #fff; font-family: sans-serif; 
+            display: flex; flex-direction: column; align-items: center;
+            background-image: radial-gradient(#fff 1px, transparent 1px);
+            background-size: 50px 50px; animation: moveStars 100s linear infinite;
+        }
+        .hero { text-align: center; padding: 40px 20px; width: 100%; max-width: 500px; }
+        .logo { width: 250px !important; height: auto; margin-bottom: 25px; display: block; margin: 0 auto; }
+        .search-box { display: flex; border: 2px solid #e50914; border-radius: 30px; overflow: hidden; background: #000; }
+        input { flex: 1; background: none; border: none; color: #fff; padding: 15px; outline: none; font-size: 16px; }
+        #search-btn { background: #e50914; color: #fff; border: none; padding: 0 20px; cursor: pointer; font-weight: bold; }
+        #grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; width: 100%; max-width: 1000px; padding: 20px; }
+        .card { background: #111; border-radius: 10px; overflow: hidden; border: 1px solid #333; cursor: pointer; }
+        .card img { width: 100%; aspect-ratio: 2/3; object-fit: cover; display: block; }
+        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); display: none; z-index: 999; justify-content: center; align-items: center; padding: 10px; }
+        .modal-content { background: #111; width: 100%; max-width: 500px; border-radius: 15px; padding: 20px; position: relative; border: 1px solid #444; }
+        #close-modal { position: absolute; top: 10px; right: 20px; font-size: 30px; cursor: pointer; color: #e50914; }
+        #video-player { width: 100%; aspect-ratio: 16/9; background: #000; margin-bottom: 15px; }
+        .provider-icon { width: 40px; height: 40px; margin: 5px; border-radius: 8px; border: 1px solid #333; }
+    </style>
 </head>
-<body id="v3-reset">
-    <header class="site-header">
-        <button id="theme-toggle">🌓 Theme</button>
-    </header>
-
-    <div class="wrapper">
-        <div class="hero">
-            <img src="logo_header.svg" class="logo" alt="Logo">
-            <div class="search-box">
-                <input type="text" id="movie-input" placeholder="MMA, 80s Horror, Space...">
-                <button id="search-btn">Search AI</button>
-            </div>
+<body>
+    <div class="hero">
+        <img src="logo_header.svg" class="logo" alt="Logo">
+        <div class="search-box">
+            <input type="text" id="user-input" placeholder="What's the vibe?">
+            <button id="search-btn">Search AI</button>
         </div>
-
-        <div id="grid"></div>
     </div>
-
+    <div id="grid"></div>
     <div id="modal" class="modal">
-        <div class="modal-box">
-            <span id="close">&times;</span>
-            <div id="trailer"></div>
-            <div class="info">
-                <h2 id="m-title"></h2>
-                <p id="m-desc"></p>
-                <div id="streaming"></div>
-            </div>
+        <div class="modal-content">
+            <span id="close-modal">&times;</span>
+            <div id="video-player"></div>
+            <h2 id="m-title"></h2>
+            <p id="m-desc" style="font-size: 14px; color: #ccc;"></p>
+            <div id="m-providers"></div>
         </div>
     </div>
+    <script>
+        const grid = document.getElementById('grid');
+        const searchBtn = document.getElementById('search-btn');
+        const userInput = document.getElementById('user-input');
 
-    <script src="main.js?v=110"></script>
+        async function getMovies(query) {
+            grid.innerHTML = "<p>Thinking...</p>";
+            const res = await fetch(`/api/movies?query=${encodeURIComponent(query)}`);
+            const data = await res.json();
+            grid.innerHTML = "";
+            data.results.forEach(m => {
+                if(!m.poster_path) return;
+                const div = document.createElement('div');
+                div.className = 'card';
+                div.innerHTML = `<img src="https://image.tmdb.org/t/p/w500${m.poster_path}">`;
+                div.onclick = () => showDetails(m.id);
+                grid.appendChild(div);
+            });
+        }
+
+        async function showDetails(id) {
+            document.getElementById('modal').style.display = 'flex';
+            const res = await fetch(`/api/movies?id=${id}&append=videos,watch/providers`);
+            const m = await res.json();
+            document.getElementById('m-title').innerText = m.title;
+            document.getElementById('m-desc').innerText = m.overview;
+            const trailer = m.videos?.results.find(v => v.type === 'Trailer');
+            document.getElementById('video-player').innerHTML = trailer ? 
+                `<iframe width="100%" height="100%" src="https://www.youtube.com/embed/${trailer.key}?autoplay=1" frameborder="0" allowfullscreen></iframe>` : 'No Trailer';
+            const providers = m['watch/providers']?.results?.US?.flatrate || [];
+            document.getElementById('m-providers').innerHTML = "<strong>Watch on:</strong><br>" + 
+                (providers.length ? providers.map(p => `<img src="https://image.tmdb.org/t/p/original${p.logo_path}" class="provider-icon">`).join('') : "Check local listings.");
+        }
+
+        searchBtn.onclick = async () => {
+            searchBtn.innerText = "...";
+            try {
+                const aiRes = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ message: `Suggest 5 movies for: ${userInput.value}. CSV format.` })
+                });
+                const aiData = await aiRes.json();
+                await getMovies(aiData.choices[0].message.content);
+            } catch(e) { await getMovies(userInput.value); }
+            searchBtn.innerText = "Search AI";
+        };
+
+        document.getElementById('close-modal').onclick = () => {
+            document.getElementById('modal').style.display = 'none';
+            document.getElementById('video-player').innerHTML = '';
+        };
+        getMovies('trending');
+    </script>
 </body>
 </html>
-
