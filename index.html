@@ -3,38 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Movie Bot V3</title>
-    <link rel="stylesheet" href="style.css?v=90.0">
+    <title>The Movie Bot | Final</title>
+    <link rel="stylesheet" href="style.css?v=110">
 </head>
-<body id="forced-v3-layout">
-    <header class="global-header">
-        <button id="theme-toggle">🌓 Change Theme</button>
+<body id="v3-reset">
+    <header class="site-header">
+        <button id="theme-toggle">🌓 Theme</button>
     </header>
 
-    <div class="app-container">
+    <div class="wrapper">
         <div class="hero">
-            <img src="logo_header.svg" class="main-logo" alt="Logo">
-            <div class="search-flex">
-                <input type="text" id="movie-input" placeholder="Type a vibe (e.g. Neon MMA)">
-                <button id="search-button">Search AI</button>
+            <img src="logo_header.svg" class="logo" alt="Logo">
+            <div class="search-box">
+                <input type="text" id="movie-input" placeholder="MMA, 80s Horror, Space...">
+                <button id="search-btn">Search AI</button>
             </div>
         </div>
 
-        <div id="results-container"></div>
+        <div id="grid"></div>
     </div>
 
-    <div id="movie-modal" class="modal">
-        <div class="modal-content">
-            <button id="modal-close">Close</button>
-            <div id="video-area"></div>
-            <div class="details">
+    <div id="modal" class="modal">
+        <div class="modal-box">
+            <span id="close">&times;</span>
+            <div id="trailer"></div>
+            <div class="info">
                 <h2 id="m-title"></h2>
                 <p id="m-desc"></p>
-                <div id="streaming-logos"></div>
+                <div id="streaming"></div>
             </div>
         </div>
     </div>
 
-    <script src="main.js?v=90.0"></script>
+    <script src="main.js?v=110"></script>
 </body>
 </html>
