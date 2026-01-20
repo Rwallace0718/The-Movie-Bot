@@ -4,28 +4,32 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>The Movie Bot</title>
-    <link rel="stylesheet" href="style.css?v=30.0">
+    <link rel="stylesheet" href="style.css?v=60.0">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
 </head>
-<body id="app-body">
+<body>
     <header class="site-header">
-        <button id="theme-toggle" type="button">🌓 Toggle Theme</button>
+        <button id="theme-toggle" type="button">🌓 Theme</button>
     </header>
 
-    <main>
-        <div class="hero-section">
+    <main class="content-wrapper">
+        <section class="hero-section">
             <img src="logo_header.svg" alt="The Movie Bot" class="main-logo">
             <div class="search-container">
                 <div class="search-box">
-                    <input type="text" id="movie-input" placeholder="MMA, space horror, etc...">
+                    <input type="text" id="movie-input" placeholder="MMA, 80s vibes, Space horror...">
                     <button id="search-button">Search AI</button>
                 </div>
             </div>
-        </div>
+        </section>
 
-        <h2 id="current-view-title" style="text-align:center;">Trending Now</h2>
+        <h2 id="current-view-title">Trending Now</h2>
+        
         <div id="results-container"></div>
-        <div class="load-more-area"><button id="load-more-btn">Show More</button></div>
+
+        <div class="load-more-area">
+            <button id="load-more-btn">Load More</button>
+        </div>
     </main>
 
     <div id="movie-modal" class="modal">
@@ -38,6 +42,7 @@
             </div>
         </div>
     </div>
-    <script src="main.js?v=30.0"></script>
+
+    <script src="main.js?v=60.0"></script>
 </body>
 </html>
