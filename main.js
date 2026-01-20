@@ -1,64 +1,56 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const results = document.getElementById('results-container');
+    const grid = document.getElementById('grid');
     const input = document.getElementById('movie-input');
-    const btn = document.getElementById('search-button');
+    const btn = document.getElementById('search-btn');
 
-    // 1. AI RECOMMENDATION LOGIC
-    btn.onclick = async () => {
-        const val = input.value.trim();
-        if(!val) return;
-        btn.innerText = "...";
-        
-        try {
-            const ai = await fetch('/api/chat', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ message: `Suggest 5 movie titles for the vibe: ${val}. Titles only, comma separated.` })
-            });
-            const aiData = await ai.json();
-            const titles = aiData.choices[0].message.content;
-            
-            // Search TMDB for those titles
-            const res = await fetch(`/api/movies?query=${encodeURIComponent(titles)}`);
-            const data = await res.json();
-            render(data.results);
-        } catch (e) { console.error(e); }
-        btn.innerText = "Search AI";
-    };
-
-    // 2. WATCH PROVIDERS LOGIC
-    async function openModal(id) {
-        const modal = document.getElementById('movie-modal');
-        modal.style.display = 'flex';
-        
-        const res = await fetch(`/api/movies?id=${id}&append=videos,watch/providers`);
-        const movie = await res.json();
-        
-        document.getElementById('m-title').innerText = movie.title;
-        document.getElementById('m-desc').innerText = movie.overview;
-        
-        // Render Streaming Icons
-        const providers = movie['watch/providers']?.results?.US?.flatrate || [];
-        const logoDiv = document.getElementById('streaming-logos');
-        logoDiv.innerHTML = providers.map(p => 
-            `<img src="https://image.tmdb.org/t/p/original${p.logo_path}" class="provider-img" title="${p.provider_name}">`
-        ).join('');
-    }
-
-    function render(list) {
-        results.innerHTML = "";
-        list.forEach(m => {
+    async function load(query) {
+        grid.innerHTML = "<p>Scanning...</p>";
+        const res = await fetch(`/api/movies?query=${encodeURIComponent(query)}`);
+        const data = await res.json();
+        grid.innerHTML = "";
+        data.results.forEach(m => {
             if(!m.poster_path) return;
-            const div = document.createElement('div');
-            div.className = 'movie-card';
-            div.innerHTML = `<img src="https://image.tmdb.org/t/p/w500${m.poster_path}">`;
-            div.onclick = () => openModal(m.id);
-            results.appendChild(div);
+            const d = document.createElement('div');
+            d.className = 'card';
+            d.innerHTML = `<img src="https://image.tmdb.org/t/p/w500${m.poster_path}">`;
+            d.onclick = () => open(m.id);
+            grid.appendChild(d);
         });
     }
 
-    document.getElementById('modal-close').onclick = () => document.getElementById('movie-modal').style.display='none';
-    
-    // Initial load
-    fetch('/api/movies?query=trending').then(r => r.json()).then(d => render(d.results));
+    async function open(id) {
+        document.getElementById('modal').style.display = 'flex';
+        const res = await fetch(`/api/movies?id=${id}&append=videos,watch/providers`);
+        const m = await res.json();
+        document.getElementById('m-title').innerText = m.title;
+        document.getElementById('m-desc').innerText = m.overview;
+        
+        const trailer = m.videos?.results.find(v => v.type === 'Trailer');
+        document.getElementById('trailer').innerHTML = trailer ? 
+            `<iframe width="100%" height="100%" src="https://www.youtube.com/embed/${trailer.key}" frameborder="0" allowfullscreen></iframe>` : 'No Trailer';
+
+        const providers = m['watch/providers']?.results?.US?.flatrate || [];
+        document.getElementById('streaming').innerHTML = "<strong>Watch on:</strong><br>" + 
+            providers.map(p => `<img src="https://image.tmdb.org/t/p/original${p.logo_path}" class="icon">`).join('');
+    }
+
+    btn.onclick = async () => {
+        btn.innerText = "...";
+        const aiRes = await fetch('/api/chat', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ message: `Recommend 5 movies for: ${input.value}. Titles only, comma separated.` })
+        });
+        const aiData = await aiRes.json();
+        await load(aiData.choices[0].message.content);
+        btn.innerText = "Search AI";
+    };
+
+    document.getElementById('close').onclick = () => {
+        document.getElementById('modal').style.display='none';
+        document.getElementById('trailer').innerHTML='';
+    }
+    document.getElementById('theme-toggle').onclick = () => document.body.classList.toggle('light-mode');
+
+    load('trending');
 });
