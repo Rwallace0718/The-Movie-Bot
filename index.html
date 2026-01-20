@@ -2,47 +2,34 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The Movie Bot</title>
-    <link rel="stylesheet" href="style.css?v=60.0">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css?v=70.0">
 </head>
 <body>
     <header class="site-header">
-        <button id="theme-toggle" type="button">🌓 Theme</button>
+        <button id="theme-toggle">🌓 Theme</button>
     </header>
-
-    <main class="content-wrapper">
-        <section class="hero-section">
-            <img src="logo_header.svg" alt="The Movie Bot" class="main-logo">
-            <div class="search-container">
-                <div class="search-box">
-                    <input type="text" id="movie-input" placeholder="MMA, 80s vibes, Space horror...">
-                    <button id="search-button">Search AI</button>
-                </div>
+    <div class="hero-section">
+        <img src="logo_header.svg" alt="The Movie Bot" class="main-logo">
+        <div class="search-container">
+            <div class="search-box">
+                <input type="text" id="movie-input" placeholder="MMA, 80s Horror, Space vibes...">
+                <button id="search-button">Search AI</button>
             </div>
-        </section>
-
-        <h2 id="current-view-title">Trending Now</h2>
-        
-        <div id="results-container"></div>
-
-        <div class="load-more-area">
-            <button id="load-more-btn">Load More</button>
         </div>
-    </main>
-
+    </div>
+    <div id="results-container"></div>
     <div id="movie-modal" class="modal">
         <div class="modal-content">
             <div id="video-area" class="video-box"></div>
             <div class="details-box">
                 <button class="close-btn" id="modal-close">Close</button>
-                <h2 id="m-title"></h2>
-                <p id="m-desc"></p>
+                <h2 id="m-title" style="margin-top:0;"></h2>
+                <p id="m-desc" style="font-size:0.9rem;line-height:1.4;color:#ccc;"></p>
             </div>
         </div>
     </div>
-
-    <script src="main.js?v=60.0"></script>
+    <script src="main.js?v=70.0"></script>
 </body>
 </html>
